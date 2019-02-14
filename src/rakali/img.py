@@ -42,13 +42,13 @@ class Image:
             self.mat = image
 
     @classmethod
-    def fromfile(cls, path: Path):
+    def from_file(cls, path: Path):
         """load image from file"""
         img = cv.imread(path)
         return cls(img)
 
     @classmethod
-    def fromurl(cls, url):
+    def from_url(cls, url):
         """load image from url"""
         img = imutils.url_to_image(url)
         return cls(img)
@@ -72,8 +72,8 @@ class Image:
         )
         return self
 
-    def rotate_bound(self, angle):
-        """rotate image by given angle"""
+    def rotate_bounded(self, angle):
+        """rotate image by given angle keeping withing origin image bounds"""
 
         self.mat = imutils.rotate_bound(
             image=self.mat,
@@ -138,10 +138,10 @@ class Image:
         """display image"""
 
         cv.imshow('Image', self.mat)
-        if cv.waitKey(wait) & 0xFF == ord(key):
-            return
+        while True:
+            if cv.waitKey(wait) & 0xFF == ord(key):
+                break
 
     def write(self, path):
         """write image to file"""
-        print(path)
         cv.imwrite(filename=path, img=self.mat)

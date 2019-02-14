@@ -1,5 +1,6 @@
 VirtualEnv
 .#*
+out.*
 *.swp
 *.pyc
 **.cache
