@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from ..img import Image
+from ..img import Image, ImageSize
 
 
 class OptionConfig(object):
@@ -35,7 +35,7 @@ def cli(config, input_file):
 def skeletonize(config):
     img = Image.fromfile(config.file)
     img.show()
-    img.skeletonize(size=(1, 1))
+    img.skeletonize(kernel_size=(3, 3))
     img.show()
 
 

@@ -2,7 +2,33 @@ import cv2 as cv
 import numpy as np
 from pathlib import Path
 
+from typing import Tuple
+
 import imutils
+
+
+class ImageSize:
+    def __init__(
+        self,
+        height: int,
+        width: int,
+    ):
+        self.height = height
+        self.width = width
+
+    def __call__(self):
+        return (self.height, self.width)
+
+    @classmethod
+    def from_mat(cls, mat):
+        height, width = mat.shape[:2]
+        return cls(height, width)
+
+    def __str__(self):
+        return f'height: {self.height}, width: {self.width}'
+
+    def __repr__(self):
+        return f'ImageSize(height={self.height}, width={self.width})'
 
 
 class Image:
@@ -65,11 +91,13 @@ class Image:
         )
         return self
 
-    def skeletonize(self, size: int, structuring: int = cv.MORPH_RECT):
+    def skeletonize(self, kernel_size: Tuple, structuring: int = cv.MORPH_RECT):
         """skeletonize image """
+
+        gray = cv.cvtColor(self.mat, cv.COLOR_BGR2GRAY)
         self.mat = imutils.skeletonize(
-            self.mat,
-            size=size,
+            gray,
+            size=kernel_size,
             structuring=structuring,
         )
         return self
