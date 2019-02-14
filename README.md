@@ -2,4 +2,7 @@
 
 Rakali is a Pythonic OpenCV wrapper.
 
-![Rakali](docs/pics/rakali.jpg)
+![Rakali by Ravenari](docs/pics/rakali.jpg)
+[1]
+
+[1](By Ravenari)
