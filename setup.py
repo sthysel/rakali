@@ -19,16 +19,21 @@ setup(
     version='0.0.1',
     description='OpenCV Helper Tools',
     long_description=read('README.rst'),
+    entry_points={
+        'console_scripts': [
+            'rakali=rakali.cli.show:cli',
+        ],
+    },
     install_requires=[
         'click',
-        'python-dotenv',
+        'numpy',
+        'scipy',
+        'opencv-python',
+        'imutils',
     ],
     author='sthysel',
     author_email='sthysel@gmail.com',
     url='https://github.com/sthysel/rakali',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
@@ -44,4 +49,7 @@ setup(
     keywords=[],
     extras_require={},
     setup_requires=[],
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
+    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
 )
