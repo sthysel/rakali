@@ -1,6 +1,6 @@
 # Rakali (Version 0.0.1)
 
-Rakali is a Pythonic OpenCV wrapper.
+Rakali is a thin shim around imutils/OpenCV that adds some conveniences.
 
 ![Rakali by Ravenari](docs/pics/rakali.jpg)
 [1]

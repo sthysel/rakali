@@ -1,2 +1,6 @@
-click==6.7
-tabulate==0.7.7
+click
+tabulate
+numpy
+scipy
+opencv-python
+imutils
