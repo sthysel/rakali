@@ -85,8 +85,8 @@ class Image:
         """resise image preserving aspect ratio"""
         self.mat = imutils.resize(
             self.mat,
-            width=None,
-            height=None,
+            width=width,
+            height=height,
             inter=interpolation,
         )
         return self

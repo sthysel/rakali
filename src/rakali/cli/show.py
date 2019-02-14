@@ -1,6 +1,7 @@
 """ Exersize rakali tools """
 
 from pathlib import Path
+import sys
 
 import click
 
@@ -49,12 +50,15 @@ def cli(config, input_file, input_url, output_file):
 
     config.output_file = Path(output_file).expanduser()
 
-    if input_file and input_file.exists():
+    if input_file and Path(input_file).exists():
         input_file = Path(input_file)
         config.img = Image.from_file(str(input_file))
     elif input_url:
         print(input_url)
         config.img = Image.from_url(input_url)
+    else:
+        click.echo('No valid input file or URL specified')
+        sys.exit()
 
 
 @cli.command()
@@ -70,7 +74,7 @@ def skeletonize(config):
 @click.option(
     '-a',
     '--angle',
-    default=90.0,
+    default=45.0,
     help='Rotate image by degrees',
     show_default=True,
 )
@@ -82,3 +86,47 @@ def rotate(config, angle):
     img: Image = config.img
     img.rotate(angle=float(angle)).show()
     img.write(config.output_file.name)
+
+
+@click.option(
+    '-a',
+    '--angle',
+    default=45.0,
+    help='Rotate image by degrees',
+    show_default=True,
+)
+@cli.command()
+@option_config
+def rotate_bounded(config, angle):
+    """Rotate the input image, keeping bound in place"""
+
+    img: Image = config.img
+    img.rotate_bounded(angle=float(angle)).show()
+    img.write(config.output_file.name)
+
+
+@click.option(
+    '-w',
+    '--width',
+    type=click.INT,
+    help='Width of resized image',
+    show_default=True,
+)
+@click.option(
+    '-h',
+    '--height',
+    type=click.INT,
+    help='Height of resized image',
+    show_default=True,
+)
+@cli.command()
+@option_config
+def resize(config, width, height):
+    """Resize the input image preserving aspect ratio, favoring width"""
+
+    img: Image = config.img
+    if width or height:
+        img.resize(width=width, height=height).show()
+        img.write(config.output_file.name)
+    else:
+        click.echo('No new width or height specified')
