@@ -2,10 +2,11 @@
 tox
 pytest
 bumpversion
+
 flake8
-coverage
 twine
 autopep8
 yapf
+
 importmagic
 epc

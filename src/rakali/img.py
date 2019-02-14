@@ -140,3 +140,8 @@ class Image:
         cv.imshow('Image', self.mat)
         if cv.waitKey(wait) & 0xFF == ord(key):
             return
+
+    def write(self, path):
+        """write image to file"""
+        print(path)
+        cv.imwrite(filename=path, img=self.mat)

@@ -21,22 +21,26 @@ option_config = click.make_pass_decorator(OptionConfig, ensure=True)
     '-i',
     '--input-file',
     type=click.Path(exists=True),
-    default=Path('.'),
     help='Use file',
     show_default=True,
 )
 @option_config
 def cli(config, input_file):
-    config.file = input_file
+    config.file = Path(input_file)
 
 
 @cli.command()
 @option_config
 def skeletonize(config):
-    img = Image.fromfile(config.file)
+    path: Path = config.file.expanduser()
+
+    img = Image.fromfile(str(path))
     img.show()
+
     img.skeletonize(kernel_size=(3, 3))
     img.show()
+
+    img.write(f'skeletonized-{path.name}')
 
 
 @cli.command()
