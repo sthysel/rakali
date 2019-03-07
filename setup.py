@@ -28,7 +28,7 @@ setup(
         'click',
         'numpy',
         'scipy',
-        'opencv-python',
+        # 'opencv-python',
         'imutils',
     ],
     author='sthysel',
