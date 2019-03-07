@@ -8,10 +8,16 @@ also intended to be used as a pedagogical resource for those.
 
 [1](By Ravenari)
 
-## Install
+# Install
 
-Rakali is dependent on OpenCV, but because many people use their own builds of OpenCV to enable CUDA it is not
-listed as a dependency in the setup.py. Listing `opencv-python`, which is the OpenCV most people use as it is
-available on pypi, would clobber any locally built and installed OpenCV. So be sure to install OpenCV's python
-bindings using either `$ pip install opencv-python` or your locally built OpenCV with CUDA or other ML
-extensions after installing rakali.
+Rakali is basically a OpenCV shim. Because many people use their own builds of OpenCV to enable CUDA or the
+like, installing Rakali may interfere with exiting custom OpenCV builds so be sure to verify OpenCV versions
+after installing Rakali. 
+
+## Manual install
+
+Clone or download this repo and in your virtualenv do:
+```
+$ pip install .
+```
+
