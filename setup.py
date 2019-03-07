@@ -16,7 +16,7 @@ def read(*names, **kwargs):
 setup(
     name='rakali',
     license='MIT',
-    version='0.0.2',
+    version='0.0.3',
     description='OpenCV Helper Tools',
     long_description=read('README.rst'),
     entry_points={
