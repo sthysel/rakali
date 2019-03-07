@@ -15,5 +15,3 @@ listed as a dependency in the setup.py. Listing `opencv-python`, which is the Op
 available on pypi, would clobber any locally built and installed OpenCV. So be sure to install OpenCV's python
 bindings using either `$ pip install opencv-python` or your locally built OpenCV with CUDA or other ML
 extensions after installing rakali.
-
-

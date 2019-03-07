@@ -15,7 +15,7 @@ def read(*names, **kwargs):
 
 setup(
     name='rakali',
-    license='GPLv2',
+    license='MIT',
     version='0.0.1',
     description='OpenCV Helper Tools',
     long_description=read('README.rst'),
@@ -28,7 +28,7 @@ setup(
         'click',
         'numpy',
         'scipy',
-        # 'opencv-python',
+        'opencv-python',
         'imutils',
     ],
     author='sthysel',
