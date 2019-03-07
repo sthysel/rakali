@@ -1,24 +1,19 @@
 # -*- encoding: utf-8 -*-
-import io
 from glob import glob
-from os.path import basename, dirname, join, splitext
+from os.path import basename, splitext
 
 from setuptools import find_packages, setup
 
-
-def read(*names, **kwargs):
-    return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8'),
-    ).read()
-
+with open('README.md', 'r') as f:
+    long_description = f.read()
 
 setup(
     name='rakali',
     license='MIT',
     version='0.0.3',
     description='OpenCV Helper Tools',
-    long_description=read('README.rst'),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     entry_points={
         'console_scripts': [
             'rakali=rakali.cli.show:cli',
@@ -37,13 +32,12 @@ setup(
     include_package_data=True,
     zip_safe=False,
     classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
         'Development Status :: 4 - Beta',
         'Operating System :: Unix',
         'Operating System :: POSIX',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: 3',
         'Topic :: Utilities',
     ],
     keywords=[],
