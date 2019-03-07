@@ -63,7 +63,7 @@ git-clean:
 
 release: clean
 	python setup.py bdist_wheel
-	twine upload ./dist/*
+	twine upload ./dist/* --verbose
 
 rst: README.md
 	pandoc --from=gfm --to=rst --output=README.rst README.md
