@@ -11,6 +11,17 @@ pedagogical resource for those.
 
 [1](By Ravenari)
 
+Usage
+=====
+
+Load and show image from file
+-----------------------------
+
+.. code:: zsh
+
+   from rakali import Image
+   Image.from_file('rakali.jpg').show()
+
 Install
 =======
 
