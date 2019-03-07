@@ -3,10 +3,12 @@
 Rakali is a imaging library and tool-set. It makes use of many other imaging libraries and frameworks and is
 also intended to be used as a pedagogical resource for those.
 
-![Rakali by Ravenari](https://raw.githubusercontent.com/sthysel/rakali/master/docs/pics/rakali.jpg)
-[1]
+![Rakali by Pia Ravenari](https://raw.githubusercontent.com/sthysel/rakali/master/docs/pics/rakali.jpg)
 
-[1](By Ravenari)
+[Pia Ravenari](https://www.deviantart.com/ravenari)
+
+Named after Hydromys chrysogaster, the Australian Otter
+
 
 # Usage
 
