@@ -10,7 +10,6 @@ also intended to be used as a pedagogical resource for those.
 Named after Hydromys chrysogaster, the Australian Otter
 
 
-
 # Library usage
 
 Library documentation generation is a work in progress...
@@ -21,6 +20,21 @@ Library documentation generation is a work in progress...
 from rakali import Image
 Image.from_file('rakali.jpg').show()
 ```
+
+## Load, annotate, and show image
+
+```zsh
+#! /usr/bin/env python
+
+from rakali import Image
+img: Image = Image.from_file('rakali.jpg')
+img.add_text(labels=['Rakali', 'Hydromys chrysogaster'])
+img.show()
+img.write('rakali-text.jpg')
+
+```
+
+![Text](https://raw.githubusercontent.com/sthysel/rakali/master/docs/pics/rakali-text.jpg)
 
 # cli usage
 
