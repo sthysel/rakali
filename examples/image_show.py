@@ -1,4 +1,6 @@
 #! /usr/bin/env python
 
 from rakali import Image
-Image.from_file('rakali.jpg').show()
+img = Image.from_file('rakali.jpg')
+img.info()
+img.show()

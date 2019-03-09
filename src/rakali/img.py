@@ -6,6 +6,8 @@ from typing import Tuple
 
 import imutils
 
+from .annotate import add_frame_labels
+
 
 class ImageSize:
     def __init__(
@@ -52,6 +54,21 @@ class Image:
         """load image from url"""
         img = imutils.url_to_image(url)
         return cls(img)
+
+    def info(self):
+        """print some information about the loaded image"""
+        height, width, channels = self.mat.shape
+        print(f'-- {width} px')
+        print(f'|  {height} px')
+        print(f'channels {channels}')
+
+    def add_text(
+        self,
+        labels=[],
+        **kwargs,
+    ):
+        """ Add labels to image"""
+        add_frame_labels(frame=self.mat, labels=labels, **kwargs)
 
     def translate(self, x: int, y: int):
         """translate image to given offsets"""

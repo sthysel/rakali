@@ -4,3 +4,4 @@ numpy
 scipy
 opencv-python
 imutils
+matplotlib
