@@ -13,4 +13,4 @@ stream = VideoStream(src=SOURCE)
 player = VideoPlayer(stream=stream)
 
 with player:
-    player.play()
+    player.autoplay()

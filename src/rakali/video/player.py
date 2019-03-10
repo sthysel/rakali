@@ -43,7 +43,11 @@ class VideoPlayer:
         else:
             return img
 
-    def play(self):
+    def autoplay(self):
+        """
+        read the stream and display each frame, applying the callback to each
+        frame
+        """
         with self.stream as st:
             while cv.waitKey(1) & 0xFF != ord('q'):
                 img = self.rescale(st.read())
