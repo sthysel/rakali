@@ -108,6 +108,18 @@ class Image:
         )
         return self
 
+    def scale(self, factor=1, interpolation=cv.INTER_AREA):
+        """scale image"""
+
+        self.mat = cv.resize(
+            self.mat,
+            None,
+            fx=factor,
+            fy=factor,
+            interpolation=interpolation,
+        )
+        return self
+
     def grey(self):
         """Grey image """
         self.mat = cv.cvtColor(self.mat, cv.COLOR_BGR2GRAY)
@@ -120,7 +132,7 @@ class Image:
 
     def skeletonize(
         self,
-        kernel_size: Tuple = (5, 5),
+        kernel_size: Tuple = (3, 3),
         structuring: int = cv.MORPH_RECT,
     ):
         """skeletonize image """
@@ -134,25 +146,15 @@ class Image:
         skeleton = np.zeros(grey.shape, dtype="uint8")
         elem = cv.getStructuringElement(structuring, kernel_size)
 
-        # keep looping until the erosions remove all pixels from the
-        # image
-        while True:
-            print('x')
-            # erode and dilate the image using the structuring element
-            eroded = cv.erode(grey, elem)
-            temp = cv.dilate(eroded, elem)
+        # erode and dilate the image using the structuring element
+        eroded = cv.erode(grey, elem)
+        temp = cv.dilate(eroded, elem)
 
-            # subtract the temporary image from the original, eroded
-            # image, then take the bitwise 'or' between the skeleton
-            # and the temporary image
-            temp = cv.subtract(grey, temp)
-            skeleton = cv.bitwise_or(skeleton, temp)
-            image = eroded.copy()
-
-            # if there are no more 'white' pixels in the image, then
-            # break from the loop
-            if area == area - cv.countNonZero(image):
-                break
+        # subtract the temporary image from the original, eroded
+        # image, then take the bitwise 'or' between the skeleton
+        # and the temporary image
+        temp = cv.subtract(grey, temp)
+        skeleton = cv.bitwise_or(skeleton, temp)
 
         self.mat = skeleton
 

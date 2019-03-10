@@ -7,7 +7,7 @@ import click
 import cv2 as cv
 
 from ..img import Image
-from ..testimages import rakali
+from ..testimages import rakali, orb_spider
 
 
 class OptionConfig(object):
