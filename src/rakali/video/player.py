@@ -15,12 +15,19 @@ class VideoPlayer:
     Plays videos
     """
 
-    def __init__(self, stream: VideoStream, scale=1, window_name='Rakali Video'):
+    def __init__(
+        self,
+        stream: VideoStream,
+        scale=1,
+        window_name='Rakali Video',
+        frame_callback=None,
+    ):
         """Video player"""
 
         self.stream = stream
         self.scale = scale
         self.window_name = window_name
+        self.callback = frame_callback
 
     def __enter__(self):
         return self
@@ -37,9 +44,11 @@ class VideoPlayer:
             return img
 
     def play(self):
-        with self.streams as st:
+        with self.stream as st:
             while cv.waitKey(1) & 0xFF != ord('q'):
                 img = self.rescale(st.read())
+                if self.callback:
+                    img = self.callback(img)
                 cv.imshow(self.window_name, img)
 
         cv.destroyAllWindows()
