@@ -7,6 +7,7 @@ import click
 import cv2 as cv
 
 from ..img import Image
+from ..testimages import rakali
 
 
 class OptionConfig(object):
@@ -57,8 +58,7 @@ def cli(config, input_file, input_url, output_file):
     elif input_url:
         config.img = Image.from_url(input_url)
     else:
-        click.echo('No valid input file or URL specified')
-        sys.exit()
+        config.img = rakali
 
 
 @cli.command()
