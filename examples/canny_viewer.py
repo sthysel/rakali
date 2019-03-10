@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from rakali import VideoPlayer, VideoStream
-from rakali.video.fps import FPS
+from rakali.video.fps import cost
 from rakali.annotate import add_frame_labels, colors
 import imutils
 
@@ -12,16 +12,13 @@ BACK_LAWN = 4
 
 SOURCE = f'rtsp://10.0.0.247:554/ch0{WATER_HEATER}/01'
 
-fps = FPS()
 
-
+@cost
 def canny(mat):
-    fps.begin()
     img = imutils.auto_canny(image=mat, sigma=0.3)
-    fps.done()
     img = add_frame_labels(
         frame=img,
-        labels=[f'FPS: {fps.fps():5.2f}'],
+        labels=[f'canny cost: {canny.cost:6.3f}ms'],
         color=colors.get('WHITE'),
     )
     return img

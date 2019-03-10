@@ -1,5 +1,20 @@
 import time
 
+import functools
+
+
+def cost(func):
+    @functools.wraps(func)
+    def wrapper_timer(*args, **kwargs):
+        start_time = time.perf_counter()
+        value = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        wrapper_timer.cost = end_time - start_time
+        return value
+
+    wrapper_timer.cost = 0
+    return wrapper_timer
+
 
 class FPS:
     """
@@ -13,12 +28,12 @@ class FPS:
 
     def begin(self):
         """start the timer"""
-        self.start = time.time()
+        self.start = time.perf_counter()
         return self
 
     def done(self):
         """stop the timer """
-        self.end = time.time()
+        self.end = time.perf_counter()
         self.frames += 1
 
     def cost(self):
@@ -26,6 +41,12 @@ class FPS:
         operation time cost
         """
         return self.end - self.start
+
+    def cost_in_ms(self):
+        """
+        operation time cost in milliseconds
+        """
+        return self.cost() * 1000
 
     def fps(self):
         """the (approximate) frames per second """
