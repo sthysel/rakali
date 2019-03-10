@@ -108,15 +108,54 @@ class Image:
         )
         return self
 
-    def skeletonize(self, kernel_size: Tuple, structuring: int = cv.MORPH_RECT):
+    def grey(self):
+        """Grey image """
+        self.mat = cv.cvtColor(self.mat, cv.COLOR_BGR2GRAY)
+        return self
+
+    def gray(self):
+        """Gray image """
+        # irritating yanks
+        return self.grey()
+
+    def skeletonize(
+        self,
+        kernel_size: Tuple = (5, 5),
+        structuring: int = cv.MORPH_RECT,
+    ):
         """skeletonize image """
 
-        gray = cv.cvtColor(self.mat, cv.COLOR_BGR2GRAY)
-        self.mat = imutils.skeletonize(
-            gray,
-            size=kernel_size,
-            structuring=structuring,
-        )
+        grey = self.grey().mat
+
+        # determine the area (i.e. total number of pixels in the image),
+        # initialize the output skeletonized image, and construct the
+        # morphological structuring element
+        area = grey.shape[0] * grey.shape[1]
+        skeleton = np.zeros(grey.shape, dtype="uint8")
+        elem = cv.getStructuringElement(structuring, kernel_size)
+
+        # keep looping until the erosions remove all pixels from the
+        # image
+        while True:
+            print('x')
+            # erode and dilate the image using the structuring element
+            eroded = cv.erode(grey, elem)
+            temp = cv.dilate(eroded, elem)
+
+            # subtract the temporary image from the original, eroded
+            # image, then take the bitwise 'or' between the skeleton
+            # and the temporary image
+            temp = cv.subtract(grey, temp)
+            skeleton = cv.bitwise_or(skeleton, temp)
+            image = eroded.copy()
+
+            # if there are no more 'white' pixels in the image, then
+            # break from the loop
+            if area == area - cv.countNonZero(image):
+                break
+
+        self.mat = skeleton
+
         return self
 
     def bgr2rgb(self):

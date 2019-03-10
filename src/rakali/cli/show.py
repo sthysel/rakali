@@ -1,9 +1,10 @@
 """ Exersize rakali tools """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import click
+import cv2 as cv
 
 from ..img import Image
 
@@ -54,11 +55,36 @@ def cli(config, input_file, input_url, output_file):
         input_file = Path(input_file)
         config.img = Image.from_file(str(input_file))
     elif input_url:
-        print(input_url)
         config.img = Image.from_url(input_url)
     else:
         click.echo('No valid input file or URL specified')
         sys.exit()
+
+
+@cli.command()
+@option_config
+def cvinfo(config):
+    """Show OpenCV Build Information"""
+
+    print(cv.getBuildInformation())
+
+
+@cli.command()
+@option_config
+def show(config):
+    """Show the input image"""
+
+    img: Image = config.img
+    img.show()
+
+
+@cli.command()
+@option_config
+def grey(config):
+    """Show the input image in grey scale"""
+
+    img: Image = config.img
+    img.grey().show()
 
 
 @cli.command()

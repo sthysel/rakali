@@ -5,13 +5,18 @@ import numpy as np
 
 
 class VideoStream:
+    """
+    Live video stream. This reader reads as fast as the stream can provide,
+    discarding the previous frame.
+    """
+
     def __init__(self, src=0):
         self.stream = cv.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
 
         # ensure a frame is ready by faking it up, this saves a lot of ugly
-        # fencing code deeper in
+        # fencing code later on
         self.width = int(self.stream.get(cv.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.stream.get(cv.CAP_PROP_FRAME_HEIGHT))
         self.frame = np.zeros((self.height, self.width, 3), np.uint8)
@@ -37,8 +42,15 @@ class VideoStream:
             (self.grabbed, self.frame) = self.stream.read()
 
     def read(self):
-        # Return the latest frame
+        """Return the latest frame """
         return self.frame
+
+    def copy(self):
+        """
+        Return a copy of the latest frame. This is a saver way of retrieving
+        frames, but also slightly slower.
+        """
+        return np.copy(self.frame)
 
     def stop(self):
         self.stopped = True
