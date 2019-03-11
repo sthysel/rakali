@@ -29,8 +29,6 @@ setup(
     author='sthysel',
     author_email='sthysel@gmail.com',
     url='https://github.com/sthysel/rakali',
-    include_package_data=True,
-    zip_safe=False,
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
