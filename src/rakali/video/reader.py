@@ -21,6 +21,9 @@ class VideoStream:
         self.height = int(self.stream.get(cv.CAP_PROP_FRAME_HEIGHT))
         self.frame = np.zeros((self.height, self.width, 3), np.uint8)
 
+    def size(self):
+        return self.width, self.height
+
     def get_wh_size(self):
         """get width, height size of frame"""
 

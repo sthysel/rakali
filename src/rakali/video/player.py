@@ -17,7 +17,7 @@ class VideoPlayer:
 
     def __init__(
         self,
-        stream: VideoStream,
+        stream: VideoStream = None,
         scale=1,
         window_name='Rakali Video',
         frame_callback=None,
@@ -57,3 +57,11 @@ class VideoPlayer:
 
         cv.destroyAllWindows()
         sys.exit()
+
+    def show(self, frame):
+        """ Show the frame """
+
+        img = self.rescale(frame)
+        if self.callback:
+            img = self.callback(img)
+        cv.imshow(self.window_name, img)
