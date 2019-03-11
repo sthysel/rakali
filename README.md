@@ -1,4 +1,4 @@
-# Rakali (Version 0.0.4)
+# Rakali (Version 0.0.5)
 
 Rakali is a imaging library and tool-set. It makes use of many other imaging libraries and frameworks and is
 also intended to be used as a pedagogical resource for those.
