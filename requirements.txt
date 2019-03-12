@@ -5,3 +5,6 @@ scipy
 opencv-python
 imutils
 matplotlib
+GPUtil
+py-cpuinfo
+
