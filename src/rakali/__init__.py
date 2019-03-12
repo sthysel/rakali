@@ -3,4 +3,4 @@ from .video.writer import VideoWriter
 from .video.player import VideoPlayer
 from .img import Image, ImageSize
 
-version = '0.0.6'
+version = '0.0.7'
