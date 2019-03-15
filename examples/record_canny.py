@@ -1,7 +1,11 @@
 #! /usr/bin/env python
-import cv2 as cv
+"""
+Cannyfy Live USB video stream
+"""
+
 from rakali import VideoPlayer, VideoStream, VideoWriter
 from rakali.video.fps import cost
+from rakali.video import go
 from rakali.annotate import add_frame_labels, colors
 import imutils
 import logging
@@ -25,7 +29,7 @@ player = VideoPlayer()
 writer = VideoWriter(size=stream.get_wh_size(), file_name='canny.avi')
 
 with stream, player, writer:
-    while cv.waitKey(1) & 0xFF != ord('q'):
+    while go():
         frame = canny(stream.read())
         writer.write(frame)
         player.show(frame)
