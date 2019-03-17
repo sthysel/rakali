@@ -68,25 +68,26 @@ def get_points_from_chessboard_images(boards_path):
 
     def check_size(image, image_size):
         if image_size is None:
-            image_size = img.shape[:2]
+            return img.shape[:2]
         else:
             if img.shape[:2] != image_size:
                 print(f'Image {fname} size incorrect')
                 sys.exit()
+        return image_size
 
     image_size = None
     images = glob.glob(str(boards_path / '*.jpg'))
     zero = get_zero_object()
     finder = ChessboardFinder()
     image_points = []
+    object_points = []
     for fname in images:
         img = cv.imread(fname)
-        check_size(image=img, image_size=image_size)
+        image_size = check_size(image=img, image_size=image_size)
         corners = finder.corners(img)
         if corners is not None:
             image_points.append(corners)
-
-    object_points = [zero * len(image_points)]
+            object_points.append(zero)
 
     return object_points, image_points, image_size
 
@@ -100,8 +101,8 @@ def calibrate(object_points, image_points, image_size):
         objectPoints=object_points,
         imagePoints=image_points,
         imageSize=image_size,
-        # cameraMatrix=None,
-        # distCoeffs=None,
+        cameraMatrix=None,
+        distCoeffs=None,
         # rvecs=None,
         # tvecs=None,
         # flags=None,
@@ -126,6 +127,9 @@ def save_calibration(
 exiting_points = load_image_points_file()
 if exiting_points:
     object_points, image_points, image_size = exiting_points
+    print(image_size)
+    print(object_points[:1])
+    print(image_points[:1])
 else:
     object_points, image_points, image_size = get_points_from_chessboard_images(boards_path=boards_path)
     save_image_points_file(
