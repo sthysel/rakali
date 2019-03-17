@@ -10,6 +10,7 @@ def cost(func):
         value = func(*args, **kwargs)
         end_time = time.perf_counter()
         wrapper_timer.cost = end_time - start_time
+        wrapper_timer.fps = 1 / (end_time - start_time)
         return value
 
     wrapper_timer.cost = 0

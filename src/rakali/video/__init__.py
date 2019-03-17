@@ -1,6 +1,6 @@
 import cv2 as cv
 from .player import VideoPlayer
-from .reader import VideoStream
+from .reader import VideoStream, VideoFile
 from .writer import VideoWriter
 from .fps import cost
 
