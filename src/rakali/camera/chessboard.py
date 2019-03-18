@@ -43,10 +43,10 @@ class ChessboardFinder:
         )
         return corners
 
-    def corners(self, frame):
+    def corners(self, frame, fast=True):
         """ Get the corners for calibration"""
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        ret, corners = self.get_chessboard_corners(gray)
+        ret, corners = self.get_chessboard_corners(gray, fast=fast)
         if ret:
             return ret, self.refine_corners(gray=gray, corners=corners)
         else:

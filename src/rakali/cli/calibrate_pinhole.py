@@ -76,10 +76,12 @@ def get_points_from_chessboard_images(boards_path, chessboard_size):
     for fname in images:
         img = cv.imread(fname)
         image_size = check_size(image=img, image_size=image_size)
-        ok, corners = finder.corners(img)
+        ok, corners = finder.corners(img, fast=False)
         if ok:
             image_points.append(corners)
             object_points.append(zero)
+        else:
+            logger.info(f'Ignoring {fname}')
 
     h, w = image_size
     return object_points, image_points, (w, h)
@@ -136,7 +138,7 @@ def do_calibrate(
     calibration_file,
     image_points_file,
     seed=888,
-    k=30,
+    k=50,
 ):
     # use previously computed image points if they are available
     exiting_points = load_image_points_file(image_points_file)
