@@ -1,8 +1,8 @@
-#!/usr/bin/env python
 """
 Calibrate pinhole camera given set of chessboard images
 """
 
+import click
 import sys
 import random
 import numpy as np
@@ -22,14 +22,6 @@ def get_zero_object(size=(9, 6)):
     return zero
 
 
-BOARDS = '~/calib/chessboards/pinhole/left/'
-CALIBRATION = '~/calib/pinhole/left/calibration.npz'
-calibration_save_file = Path(CALIBRATION).expanduser()
-
-boards_path = Path(BOARDS).expanduser()
-image_points_save_file = boards_path / 'image_points.npz'
-
-
 def save_image_points_file(
     save_file,
     object_points,
@@ -44,7 +36,7 @@ def save_image_points_file(
     )
 
 
-def load_image_points_file(save_file=image_points_save_file):
+def load_image_points_file(save_file):
     """load from previously computed file """
 
     try:
@@ -60,7 +52,7 @@ def load_image_points_file(save_file=image_points_save_file):
         return None
 
 
-def get_points_from_chessboard_images(boards_path):
+def get_points_from_chessboard_images(boards_path, chessboard_size):
     """
     Process folder with chesboard images and gather image points
     """
@@ -78,14 +70,14 @@ def get_points_from_chessboard_images(boards_path):
     image_size = None
     images = glob.glob(str(boards_path / '*.jpg'))
     zero = get_zero_object()
-    finder = ChessboardFinder()
+    finder = ChessboardFinder(chessboard_size)
     image_points = []
     object_points = []
     for fname in images:
         img = cv.imread(fname)
         image_size = check_size(image=img, image_size=image_size)
-        corners = finder.corners(img)
-        if corners is not None:
+        ok, corners = finder.corners(img)
+        if ok:
             image_points.append(corners)
             object_points.append(zero)
 
@@ -112,33 +104,59 @@ def calibrate(object_points, image_points, image_size):
     return camera_matrix, distortion_coefficients, rotation, translation
 
 
-def reprojection_error(object_points, image_points, rotation, translation, camera_matrix, distortion):
+def reprojection_error(
+    object_points,
+    image_points,
+    rotation,
+    translation,
+    camera_matrix,
+    distortion,
+):
+    """ Calculate reprojection error"""
+
     total_error = 0
     length = len(object_points)
     for i in range(length):
-        __imgpoints2, _ = cv.projectPoints(object_points[i], rotation[i], translation[i], camera_matrix, distortion)
-        error = cv.norm(image_points[i], __imgpoints2, cv.NORM_L2) / len(__imgpoints2)
+        __imgpoints, _ = cv.projectPoints(
+            objectPoints=object_points[i],
+            rvec=rotation[i],
+            tvec=translation[i],
+            cameraMatrix=camera_matrix,
+            distCoeffs=distortion,
+        )
+        error = cv.norm(image_points[i], __imgpoints, cv.NORM_L2) / len(__imgpoints)
         total_error += error
 
     return total_error / length
 
 
-def do_calibrate(calibration_file=calibration_save_file, seed=128, k=50):
+def do_calibrate(
+    input_folder,
+    chessboard_size,
+    calibration_file,
+    image_points_file,
+    seed=888,
+    k=30,
+):
     # use previously computed image points if they are available
-    exiting_points = load_image_points_file()
+    exiting_points = load_image_points_file(image_points_file)
     if exiting_points:
         object_points, image_points, image_size = exiting_points
     else:
-        object_points, image_points, image_size = get_points_from_chessboard_images(boards_path=boards_path)
+        object_points, image_points, image_size = get_points_from_chessboard_images(
+            boards_path=input_folder,
+            chessboard_size=chessboard_size,
+        )
         save_image_points_file(
-            save_file=image_points_save_file,
+            save_file=image_points_file,
             object_points=object_points,
             image_points=image_points,
             image_size=image_size,
         )
 
     w, h = image_size
-    assert(w > h)
+    assert (w > h)
+
     # reduce points list else calibration takes too long
     random.seed(seed)
     image_points = random.choices(image_points, k=k)
@@ -171,7 +189,61 @@ def do_calibrate(calibration_file=calibration_save_file, seed=128, k=50):
         k=k,
         error=error,
     )
-    print(f'Reprojection error {error}')
+    return error
 
 
-do_calibrate()
+@click.command(context_settings=dict(max_content_width=120))
+@click.version_option()
+@click.option(
+    '-i',
+    '--input-folder',
+    help='Folder where chessboard images are stored',
+    default='~/rakali/chessboards/',
+    show_default=True,
+)
+@click.option(
+    '--image-points-file',
+    help='Corner points data',
+    default='image_points.npz',
+    show_default=True,
+)
+@click.option(
+    '--calibration-file',
+    help='Camera calibration data',
+    default='calibration.npz',
+    show_default=True,
+)
+@click.option(
+    '--chessboard-rows',
+    help='Chessboard rows',
+    default=9,
+    show_default=True,
+)
+@click.option(
+    '--chessboard-columns',
+    help='Chessboard columns',
+    default=6,
+    show_default=True,
+)
+def cli(
+    input_folder,
+    image_points_file,
+    calibration_file,
+    chessboard_rows,
+    chessboard_columns,
+):
+    """
+    Calibrate pinhole camera using chessboard frames captured earlier.
+    """
+    input_folder = Path(input_folder).expanduser()
+    if not input_folder.exists():
+        click.secho(message=f'Folder {input_folder} does not exist', err=True)
+        sys.exit()
+
+    error = do_calibrate(
+        input_folder=input_folder,
+        chessboard_size=(chessboard_columns, chessboard_rows),
+        calibration_file=calibration_file,
+        image_points_file=image_points_file,
+    )
+    click.secho(message=f'Calibration error: {error}')

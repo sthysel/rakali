@@ -18,6 +18,7 @@ setup(
         'console_scripts': [
             'rakali=rakali.cli.show:cli',
             'rakali-find-chessboards=rakali.cli.find_chessboards_live:cli',
+            'rakali-pinhole-calibrate=rakali.cli.calibrate_pinhole:cli',
         ],
     },
     install_requires=[
