@@ -16,10 +16,11 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def get_zero_object(size=(9, 6)):
-    zero = np.zeros((size[0] * size[1], 3), np.float32)
-    zero[:, :2] = np.mgrid[0:size[0], 0:size[1]].T.reshape(-1, 2)
-    return zero
+def get_zero_object(pattern_size=(9, 6), square_size=0.023):
+    pattern_points = np.zeros((np.prod(pattern_size), 3), np.float32)
+    pattern_points[:, :2] = np.indices(pattern_size).T.reshape(-1, 2)
+    pattern_points *= square_size
+    return pattern_points
 
 
 def save_image_points_file(
