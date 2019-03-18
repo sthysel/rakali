@@ -6,7 +6,8 @@ import cv2 as cv
 
 from ..video import cost
 
-CALIB_FLAGS = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE + cv.CALIB_CB_FAST_CHECK
+CALIB_FLAGS_THOROUGH = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_NORMALIZE_IMAGE + cv.CALIB_CB_FAST_CHECK
+CALIB_FLAGS_FAST = cv.CALIB_CB_FAST_CHECK
 SUBPIXEL_CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
 
 
@@ -17,14 +18,18 @@ class ChessboardFinder:
     ):
         self.size = chessboard_size
 
-    def get_chessboard_corners(self, gray):
+    def get_chessboard_corners(self, gray, fast=True):
         """test if frame contains a checkerboard of appropiate size"""
 
-        # Find the chess board corners
+        if fast:
+            flags = CALIB_FLAGS_FAST
+        else:
+            flags = CALIB_FLAGS_THOROUGH
+
         ret, corners = cv.findChessboardCorners(
             image=gray,
             patternSize=self.size,
-            flags=CALIB_FLAGS,
+            flags=flags,
         )
         return ret, corners
 

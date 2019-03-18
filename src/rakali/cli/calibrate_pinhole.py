@@ -4,6 +4,7 @@ Calibrate pinhole camera given set of chessboard images
 """
 
 import sys
+import random
 import numpy as np
 import cv2 as cv
 from pathlib import Path
@@ -97,7 +98,7 @@ def calibrate(object_points, image_points, image_size):
     Calibrate the pinhole camera using image points
     """
     logging.debug('Calibrating...')
-    _, camera_matrix, distortion_coefficients, _, _ = cv.calibrateCamera(
+    _, camera_matrix, distortion_coefficients, rotation, translation = cv.calibrateCamera(
         objectPoints=object_points,
         imagePoints=image_points,
         imageSize=image_size,
@@ -108,42 +109,56 @@ def calibrate(object_points, image_points, image_size):
         # flags=None,
         # criteria=0,
     )
-    return camera_matrix, distortion_coefficients
+    return camera_matrix, distortion_coefficients, rotation, translation
 
 
-def save_calibration(
-    calibration_file,
-    camera_matrix,
-    distortion_coefficients,
-):
-    np.savez_compressed(
-        calibration_file,
-        camera_matrix=camera_matrix,
-        distortion_coefficients=distortion_coefficients,
-    )
+def error_estimate(object_points, image_points, rotation, translation, camera_matrix, distortion):
+    total_error = 0
+    length = len(object_points)
+    for i in range(length):
+        __imgpoints2, _ = cv.projectPoints(object_points[i], rotation[i], translation[i], camera_matrix, distortion)
+        error = cv.norm(image_points[i], __imgpoints2, cv.NORM_L2) / len(__imgpoints2)
+        total_error += error
+
+    return total_error / length
 
 
-# use previously computed image points if they are available
-exiting_points = load_image_points_file()
-if exiting_points:
-    object_points, image_points, image_size = exiting_points
-else:
-    object_points, image_points, image_size = get_points_from_chessboard_images(boards_path=boards_path)
-    save_image_points_file(
-        save_file=image_points_save_file,
+def do_calibrate(calibration_file=calibration_save_file, seed=69, k=50):
+    # use previously computed image points if they are available
+    exiting_points = load_image_points_file()
+    if exiting_points:
+        object_points, image_points, image_size = exiting_points
+    else:
+        object_points, image_points, image_size = get_points_from_chessboard_images(boards_path=boards_path)
+        save_image_points_file(
+            save_file=image_points_save_file,
+            object_points=object_points,
+            image_points=image_points,
+            image_size=image_size,
+        )
+
+    # reduce points list else calibration takes too long
+    random.seed(seed)
+    image_points = random.choices(image_points, k=k)
+    object_points = object_points[:k]
+
+    matrix, dist_coeff, rotation, translation = calibrate(
         object_points=object_points,
         image_points=image_points,
         image_size=image_size,
     )
+    error = error_estimate(object_points, image_points, rotation, translation, matrix, dist_coeff)
+    np.savez_compressed(
+        calibration_file,
+        camera_matrix=matrix,
+        distortion_coefficients=dist_coeff,
+        rotation=rotation,
+        translation=translation,
+        seed=seed,
+        k=k,
+        error=error,
+    )
+    print(f'Error estimate {error}')
 
-matrix, dist_coeff = calibrate(
-    object_points=object_points,
-    image_points=image_points,
-    image_size=image_size,
-)
-save_calibration(
-    calibration_file=calibration_save_file,
-    camera_matrix=matrix,
-    distortion_coefficients=dist_coeff,
-)
-print(matrix, dist_coeff)
+
+do_calibrate()

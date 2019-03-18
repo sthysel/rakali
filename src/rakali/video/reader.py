@@ -44,7 +44,7 @@ class VideoFile:
         self.stream.release()
 
 
-class VideoFrameEnqueuer:
+class VideoFrameEnqueuer(Thread):
     """
     Loads images into a queue for processing by consumers.
     If a queue is not injected, create one.
@@ -52,6 +52,7 @@ class VideoFrameEnqueuer:
     """
 
     def __init__(self, src=0, q=None):
+        super().__init__()
         self.stopped = False
         if q is None:
             self.q = queue.Queue(maxsize=100)
@@ -63,6 +64,13 @@ class VideoFrameEnqueuer:
 
         self.width = int(self.stream.get(cv.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.stream.get(cv.CAP_PROP_FRAME_HEIGHT))
+
+    def run(self):
+        while not self.stopped:
+            self.grabbed, self.frame = self.stream.read()
+            count = int(self.stream.get(cv.CAP_PROP_POS_FRAMES))
+            self.q.put((self.grabbed, self.frame, count))
+        self.stream.release()
 
     def size(self):
         return self.width, self.height
@@ -86,21 +94,7 @@ class VideoFrameEnqueuer:
         return self
 
     def __exit__(self, type, value, traceback):
-        self.stop()
-        self.stream.release()
-
-    def start(self):
-        Thread(target=self.update, args=()).start()
-        return self
-
-    def stop(self):
         self.stopped = True
-
-    def update(self):
-        while not self.stopped:
-            self.grabbed, self.frame = self.stream.read()
-            count = int(self.stream.get(cv.CAP_PROP_POS_FRAMES))
-            self.q.put((self.grabbed, self.frame, count))
 
 
 class VideoStream:
@@ -156,6 +150,7 @@ class VideoStream:
 
     def stop(self):
         self.stopped = True
+        self.join()
 
     def __enter__(self):
         self.start()
