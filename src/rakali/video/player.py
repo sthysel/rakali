@@ -50,10 +50,14 @@ class VideoPlayer:
         """
         with self.stream as st:
             while cv.waitKey(1) & 0xFF != ord('q'):
-                img = self.rescale(st.read())
-                if self.callback:
-                    img = self.callback(img)
-                cv.imshow(self.window_name, img)
+                ok, frame = st.read()
+                if ok:
+                    img = self.rescale(frame)
+                    if self.callback:
+                        img = self.callback(img)
+                    cv.imshow(self.window_name, img)
+                else:
+                    print('No more frames')
 
         cv.destroyAllWindows()
         sys.exit()

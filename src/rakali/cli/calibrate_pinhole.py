@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_zero_object(size=(9, 6)):
-    size = (9, 6)
     zero = np.zeros((size[0] * size[1], 3), np.float32)
     zero[:, :2] = np.mgrid[0:size[0], 0:size[1]].T.reshape(-1, 2)
     return zero
@@ -112,7 +111,7 @@ def calibrate(object_points, image_points, image_size):
     return camera_matrix, distortion_coefficients, rotation, translation
 
 
-def error_estimate(object_points, image_points, rotation, translation, camera_matrix, distortion):
+def reprojection_error(object_points, image_points, rotation, translation, camera_matrix, distortion):
     total_error = 0
     length = len(object_points)
     for i in range(length):
@@ -123,7 +122,7 @@ def error_estimate(object_points, image_points, rotation, translation, camera_ma
     return total_error / length
 
 
-def do_calibrate(calibration_file=calibration_save_file, seed=69, k=50):
+def do_calibrate(calibration_file=calibration_save_file, seed=128, k=50):
     # use previously computed image points if they are available
     exiting_points = load_image_points_file()
     if exiting_points:
@@ -147,10 +146,21 @@ def do_calibrate(calibration_file=calibration_save_file, seed=69, k=50):
         image_points=image_points,
         image_size=image_size,
     )
-    error = error_estimate(object_points, image_points, rotation, translation, matrix, dist_coeff)
+
+    new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(
+        cameraMatrix=matrix,
+        distCoeffs=dist_coeff,
+        imageSize=image_size,
+        alpha=1,
+        newImgSize=image_size,
+    )
+
+    error = reprojection_error(object_points, image_points, rotation, translation, matrix, dist_coeff)
     np.savez_compressed(
         calibration_file,
         camera_matrix=matrix,
+        new_camera_matrix=new_camera_matrix,
+        roi=roi,
         distortion_coefficients=dist_coeff,
         rotation=rotation,
         translation=translation,
@@ -158,7 +168,7 @@ def do_calibrate(calibration_file=calibration_save_file, seed=69, k=50):
         k=k,
         error=error,
     )
-    print(f'Error estimate {error}')
+    print(f'Reprojection error {error}')
 
 
 do_calibrate()

@@ -150,7 +150,6 @@ class VideoStream:
 
     def stop(self):
         self.stopped = True
-        self.join()
 
     def __enter__(self):
         self.start()

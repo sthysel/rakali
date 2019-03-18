@@ -14,7 +14,7 @@ from rakali.camera.chessboard import ChessboardFinder
 from rakali.video.reader import VideoFrameEnqueuer
 from rakali.video.fps import cost
 
-SOURCE = '~/calib/pin/l.mkv'
+SOURCE = '~/calib/pinhole/l.mkv'
 OUT_FOLDER = '~/calib/chessboards/pinhole/left/'
 
 
