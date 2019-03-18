@@ -48,9 +48,9 @@ class ChessboardFinder:
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ret, corners = self.get_chessboard_corners(gray)
         if ret:
-            return self.refine_corners(gray=gray, corners=corners)
+            return ret, self.refine_corners(gray=gray, corners=corners)
         else:
-            None
+            return ret, None
 
     @cost
     def has_chessboard(self, frame):
@@ -58,3 +58,7 @@ class ChessboardFinder:
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ret, _ = self.get_chessboard_corners(gray=gray)
         return ret
+
+    def draw(self, frame, corners):
+        """Draw the chessboard corners"""
+        return cv.drawChessboardCorners(frame, self.size, corners, True)

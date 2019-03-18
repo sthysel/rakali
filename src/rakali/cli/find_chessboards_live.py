@@ -36,15 +36,17 @@ def find_chessboards_in_stream(source, out_folder):
             ok, frame = stream.read()
             labels = [f'FPS {stream.read.cost:.6f}s']
             if ok:
-                if finder.has_chessboard(frame):
+                display_frame = frame.copy()
+                has_corners, corners = finder.corners(frame)
+                if has_corners:
                     cv.imwrite(f'{out_path}/{count:05}.jpg', frame)
                     count += 1
                     labels.append('CHESSBOARD')
+                    finder.draw(display_frame, corners)
                 else:
                     labels.append('NO CHESSBOARD FOR YOU')
 
                 labels.append(f'find chessboard cost: {finder.has_chessboard.cost:.3f}s')
-                display_frame = frame.copy()
                 add_frame_labels(display_frame, labels=labels)
                 player.show(display_frame)
             else:
