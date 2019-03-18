@@ -127,9 +127,6 @@ def save_calibration(
 exiting_points = load_image_points_file()
 if exiting_points:
     object_points, image_points, image_size = exiting_points
-    print(image_size)
-    print(object_points[:1])
-    print(image_points[:1])
 else:
     object_points, image_points, image_size = get_points_from_chessboard_images(boards_path=boards_path)
     save_image_points_file(

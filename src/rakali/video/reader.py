@@ -44,11 +44,11 @@ class VideoFile:
         self.stream.release()
 
 
-class VideoFileProducer:
+class VideoFrameEnqueuer:
     """
     Loads images into a queue for processing by consumers.
     If a queue is not injected, create one.
-    Seems like OpenCV can load frames way faster in a thread out of the main thread 🤦
+    Seems like OpenCV can load frames way faster in a thread out of the main thread
     """
 
     def __init__(self, src=0, q=None):
@@ -99,7 +99,8 @@ class VideoFileProducer:
     def update(self):
         while not self.stopped:
             self.grabbed, self.frame = self.stream.read()
-            self.q.put((self.grabbed, self.frame))
+            count = int(self.stream.get(cv.CAP_PROP_POS_FRAMES))
+            self.q.put((self.grabbed, self.frame, count))
 
 
 class VideoStream:
