@@ -89,7 +89,8 @@ def get_points_from_chessboard_images(boards_path):
             image_points.append(corners)
             object_points.append(zero)
 
-    return object_points, image_points, image_size
+    h, w = image_size
+    return object_points, image_points, (w, h)
 
 
 def calibrate(object_points, image_points, image_size):
@@ -136,6 +137,8 @@ def do_calibrate(calibration_file=calibration_save_file, seed=128, k=50):
             image_size=image_size,
         )
 
+    w, h = image_size
+    assert(w > h)
     # reduce points list else calibration takes too long
     random.seed(seed)
     image_points = random.choices(image_points, k=k)
