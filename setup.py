@@ -17,6 +17,7 @@ setup(
     entry_points={
         'console_scripts': [
             'rakali=rakali.cli.show:cli',
+            'rakali-find-chessboards=rakali.cli.find_chessboards_live:cli',
         ],
     },
     install_requires=[

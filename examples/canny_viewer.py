@@ -10,8 +10,8 @@ WATER_HEATER = 2
 PARK = 3
 BACK_LAWN = 4
 
-# SOURCE = f'rtsp://10.0.0.247:554/ch0{WATER_HEATER}/01'
-SOURCE = f'rtsp://10.41.212.133/axis-media/media.amp?camera=2'
+SOURCE = f'rtsp://10.0.0.247:554/ch0{WATER_HEATER}/01'
+# SOURCE = f'rtsp://10.41.212.133/axis-media/media.amp?camera=2'
 
 
 @cost

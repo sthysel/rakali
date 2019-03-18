@@ -1,13 +1,12 @@
 """ Exersize rakali tools """
 
-import sys
 from pathlib import Path
 
 import click
 import cv2 as cv
 
 from ..img import Image
-from ..testimages import rakali, orb_spider
+from ..testimages import rakali
 
 
 class OptionConfig(object):

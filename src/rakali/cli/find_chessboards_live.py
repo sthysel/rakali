@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 """
 Find chessboards in image stream and sort frames in folder
 """
@@ -6,24 +5,27 @@ Find chessboards in image stream and sort frames in folder
 from pathlib import Path
 
 import cv2 as cv
+import click
 
 from rakali.annotate import add_frame_labels
 from rakali.camera.chessboard import ChessboardFinder
 from rakali.video import VideoPlayer, go
-from rakali.video.reader import VideoFileProducer
-
-SOURCE = '~/calib/pin/l.mkv'
-OUT_FOLDER = '~/calib/chessboards/pinhole/left/'
+from rakali.video.reader import VideoStream
 
 
 def find_chessboards_in_stream(source, out_folder):
-    """
-    test each frame in the stream for the presence of a chess-board pattern
-    """
-    out_path = Path(OUT_FOLDER).expanduser()
-    source_path = Path(SOURCE).expanduser()
 
-    stream = VideoFileProducer(src=str(source_path))
+    # accommodate the types of sources
+    try:
+        source = int(source)
+        source_path = source
+    except ValueError:
+        source_path = str(Path(source).expanduser())
+
+    out_path = Path(out_folder).expanduser()
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    stream = VideoStream(src=source_path)
 
     finder = ChessboardFinder()
     player = VideoPlayer(stream=stream)
@@ -42,14 +44,32 @@ def find_chessboards_in_stream(source, out_folder):
                     labels.append('NO CHESSBOARD FOR YOU')
 
                 labels.append(f'find chessboard cost: {finder.has_chessboard.cost:.3f}s')
-                add_frame_labels(frame, labels=labels)
-                player.show(frame)
+                display_frame = frame.copy()
+                add_frame_labels(display_frame, labels=labels)
+                player.show(display_frame)
             else:
                 print('No more frames')
                 break
 
 
-SOURCE = '~/calib/pin/l.mkv'
-OUT_FOLDER = '~/calib/chessboards/pinhole/left/'
-
-find_chessboards_in_stream(source=SOURCE, out_folder=OUT_FOLDER)
+@click.command(context_settings=dict(max_content_width=120))
+@click.version_option()
+@click.option(
+    '-s',
+    '--source',
+    help='Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
+    default=0,
+    show_default=True,
+)
+@click.option(
+    '-o',
+    '--output-folder',
+    help='Fetch image from URL',
+    show_default=True,
+)
+def cli(source, output_folder):
+    """
+    test each frame in the stream for the presence of a chess-board pattern
+    if found, save to the output folder
+    """
+    find_chessboards_in_stream(source=source, out_folder=output_folder)

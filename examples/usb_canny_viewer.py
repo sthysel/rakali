@@ -5,6 +5,7 @@ from rakali.video.fps import cost
 from rakali.annotate import add_frame_labels, colors
 import imutils
 
+
 @cost
 def canny(mat):
     img = imutils.auto_canny(image=mat, sigma=0.3)
