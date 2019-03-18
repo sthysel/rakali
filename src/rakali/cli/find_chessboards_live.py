@@ -13,8 +13,7 @@ from rakali.video import VideoPlayer, go
 from rakali.video.reader import VideoStream
 
 
-def find_chessboards_in_stream(source, out_folder):
-
+def find_chessboards_in_stream(source, chessboard_size, out_folder):
     # accommodate the types of sources
     try:
         source = int(source)
@@ -27,7 +26,7 @@ def find_chessboards_in_stream(source, out_folder):
 
     stream = VideoStream(src=source_path)
 
-    finder = ChessboardFinder()
+    finder = ChessboardFinder(chessboard_size)
     player = VideoPlayer(stream=stream)
 
     with player, stream:
@@ -67,11 +66,29 @@ def find_chessboards_in_stream(source, out_folder):
     '-o',
     '--output-folder',
     help='Fetch image from URL',
+    default='~/rakali/chessboards/',
     show_default=True,
 )
-def cli(source, output_folder):
+@click.option(
+    '--chessboard-rows',
+    help='Chessboard rows',
+    default=9,
+    show_default=True,
+)
+@click.option(
+    '--chessboard-columns',
+    help='Chessboard columns',
+    default=6,
+    show_default=True,
+)
+def cli(source, output_folder, chessboard_rows, chessboard_columns):
     """
-    test each frame in the stream for the presence of a chess-board pattern
-    if found, save to the output folder
+    Test each frame in the stream for the presence of a chess-board pattern.
+    If found, save to the output folder
     """
-    find_chessboards_in_stream(source=source, out_folder=output_folder)
+    size = (chessboard_columns, chessboard_rows)
+    find_chessboards_in_stream(
+        source=source,
+        chessboard_size=size,
+        out_folder=output_folder,
+    )
