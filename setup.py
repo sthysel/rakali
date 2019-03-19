@@ -20,6 +20,8 @@ setup(
             'rakali-find-chessboards=rakali.cli.find_chessboards_live:cli',
             'rakali-pinhole-calibrate=rakali.cli.calibrate_pinhole:cli',
             'rakali-find-ipcameras=rakali.cli.find_ip_cameras:cli',
+            'rakali-undistort-pinhole=rakali.cli.undistort_pinhole:cli',
+            'rakali-view=rakali.cli.view_feed:cli',
         ],
     },
     install_requires=[
