@@ -53,7 +53,7 @@ def load_image_points_file(save_file):
         return None
 
 
-def get_points_from_chessboard_images(boards_path, chessboard_size):
+def get_points_from_chessboard_images(boards_path, chessboard_size, square_size):
     """
     Process folder with chesboard images and gather image points
     """
@@ -70,7 +70,7 @@ def get_points_from_chessboard_images(boards_path, chessboard_size):
 
     image_size = None
     images = glob.glob(str(boards_path / '*.jpg'))
-    zero = get_zero_object()
+    zero = get_zero_object(square_size)
     finder = ChessboardFinder(chessboard_size)
     image_points = []
     object_points = []
@@ -136,6 +136,7 @@ def reprojection_error(
 def do_calibrate(
     input_folder,
     chessboard_size,
+    square_size,
     calibration_file,
     image_points_file,
     seed=888,
@@ -149,6 +150,7 @@ def do_calibrate(
         object_points, image_points, image_size = get_points_from_chessboard_images(
             boards_path=input_folder,
             chessboard_size=chessboard_size,
+            square_size=square_size,
         )
         save_image_points_file(
             save_file=image_points_file,
@@ -228,12 +230,19 @@ def do_calibrate(
     default=6,
     show_default=True,
 )
+@click.option(
+    '--square-size',
+    help='Chessboard square size in m',
+    default=0.023,
+    show_default=True,
+)
 def cli(
     input_folder,
     image_points_file,
     calibration_file,
     chessboard_rows,
     chessboard_columns,
+    square_size,
 ):
     """
     Calibrate pinhole camera using chessboard frames captured earlier.
@@ -246,6 +255,7 @@ def cli(
     error = do_calibrate(
         input_folder=input_folder,
         chessboard_size=(chessboard_columns, chessboard_rows),
+        square_size=square_size,
         calibration_file=calibration_file,
         image_points_file=image_points_file,
     )
