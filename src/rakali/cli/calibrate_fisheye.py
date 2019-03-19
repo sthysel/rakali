@@ -19,20 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_zero_object(pattern_size=(9, 6), square_size=0.023):
-
-    columns, rows = pattern_size # 6, 9
-    CHECKERBOARD = (6, 9)
-    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
-    return objp
-
-
-def get_zero_object(pattern_size=(9, 6), square_size=0.023):
-
     columns, rows = pattern_size
-    CHECKERBOARD = (6, 9)
-    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+    objp = np.zeros((1, rows * columns, 3), np.float32)
+    objp[0, :, :2] = np.mgrid[0:rows, 0:columns].T.reshape(-1, 2)
     return objp
 
 
@@ -139,8 +128,8 @@ def do_calibrate(
     square_size,
     calibration_file,
     image_points_file,
-    seed=888,
-    k=50,
+    salt=888,
+    pick_size=50,
 ):
     # use previously computed image points if they are available
     exiting_points = load_image_points_file(image_points_file)
@@ -163,9 +152,9 @@ def do_calibrate(
     assert (w > h)
 
     # reduce points list else calibration takes too long
-    random.seed(seed)
-    image_points = random.choices(image_points, k=k)
-    object_points = object_points[:k]
+    random.seed(salt)
+    image_points = random.choices(image_points, k=pick_size)
+    object_points = object_points[:pick_size]
 
     rms, K, D = calibrate(
         object_points=object_points,
@@ -177,10 +166,10 @@ def do_calibrate(
         calibration_file,
         K=K,
         D=D,
-        seed=seed,
-        k=k,
+        seed=salt,
+        k=pick_size,
     )
-    print(f'RMS {rms}')
+    return rms
 
 
 @click.command(context_settings=dict(max_content_width=120))
@@ -222,6 +211,18 @@ def do_calibrate(
     default=0.023,
     show_default=True,
 )
+@click.option(
+    '--salt',
+    help='Seed value for random picking of calibration images from a large set',
+    default=888,
+    show_default=True,
+)
+@click.option(
+    '--pick-size',
+    help='Size of image set to use for calibration, picked from available set',
+    default=50,
+    show_default=True,
+)
 def cli(
     input_folder,
     image_points_file,
@@ -229,10 +230,16 @@ def cli(
     chessboard_rows,
     chessboard_columns,
     square_size,
+    salt,
+    pick_size,
 ):
     """
     Calibrate pinhole camera using chessboard frames captured earlier.
     """
+    if pick_size < 5:
+        print(f'A set of {pick_size} is to small')
+        sys.exit()
+
     input_folder = Path(input_folder).expanduser()
     if not input_folder.exists():
         click.secho(message=f'Folder {input_folder} does not exist', err=True)
@@ -244,5 +251,7 @@ def cli(
         square_size=square_size,
         calibration_file=calibration_file,
         image_points_file=image_points_file,
+        salt=salt,
+        pick_size=pick_size,
     )
     click.secho(message=f'Calibration error: {error}')
