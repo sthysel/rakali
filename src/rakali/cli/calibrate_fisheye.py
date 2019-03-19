@@ -19,10 +19,21 @@ logger = logging.getLogger(__name__)
 
 
 def get_zero_object(pattern_size=(9, 6), square_size=0.023):
-    pattern_points = np.zeros((np.prod(pattern_size), 3), np.float32)
-    pattern_points[:, :2] = np.indices(pattern_size).T.reshape(-1, 2)
-    pattern_points *= square_size
-    return pattern_points
+
+    columns, rows = pattern_size # 6, 9
+    CHECKERBOARD = (6, 9)
+    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+    return objp
+
+
+def get_zero_object(pattern_size=(9, 6), square_size=0.023):
+
+    columns, rows = pattern_size
+    CHECKERBOARD = (6, 9)
+    objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+    objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+    return objp
 
 
 def save_image_points_file(
@@ -119,7 +130,7 @@ def calibrate(object_points, image_points, image_size):
         criteria=(cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 1e-6),
     )
 
-    return rms, image_size, K, D
+    return rms, K, D
 
 
 def do_calibrate(
