@@ -166,9 +166,15 @@ def do_calibrate(
         calibration_file,
         K=K,
         D=D,
+        image_size=image_size,
         seed=salt,
         k=pick_size,
     )
+
+    print(f'DIM={image_size}')
+    print(f'K=np.array({str(K.tolist())})')
+    print(f'D=np.array({str(D.tolist())})')
+
     return rms
 
 
