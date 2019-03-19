@@ -63,7 +63,7 @@ def find_chessboards_in_stream(source, chessboard_size, out_folder):
     '-s',
     '--source',
     help='Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
-    default="rtsp://10.41.212.144/axis-media/media.amp?camera=1",
+    default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1",
     show_default=True,
 )
 @click.option(
