@@ -15,11 +15,15 @@ from rakali.video.reader import VideoStream
 
 def find_chessboards_in_stream(source, chessboard_size, out_folder):
     # accommodate the types of sources
-    try:
-        source = int(source)
+    if source.find('rtsp') >= 0:
         source_path = source
-    except ValueError:
-        source_path = str(Path(source).expanduser())
+    else:
+        try:
+            source = int(source)
+            source_path = source
+        except ValueError:
+            source_path = str(Path(source).expanduser())
+    print(source_path)
 
     out_path = Path(out_folder).expanduser()
     out_path.mkdir(parents=True, exist_ok=True)
@@ -59,7 +63,7 @@ def find_chessboards_in_stream(source, chessboard_size, out_folder):
     '-s',
     '--source',
     help='Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
-    default=0,
+    default="rtsp://10.41.212.144/axis-media/media.amp?camera=1",
     show_default=True,
 )
 @click.option(

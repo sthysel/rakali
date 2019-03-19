@@ -70,7 +70,10 @@ def get_points_from_chessboard_images(boards_path, chessboard_size, square_size)
 
     image_size = None
     images = glob.glob(str(boards_path / '*.jpg'))
-    zero = get_zero_object(square_size)
+    zero = get_zero_object(
+        square_size=square_size,
+        pattern_size=chessboard_size,
+    )
     finder = ChessboardFinder(chessboard_size)
     image_points = []
     object_points = []
