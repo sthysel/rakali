@@ -12,6 +12,8 @@ import glob
 import logging
 from rakali.camera.chessboard import ChessboardFinder
 
+from rakali.camera.fisheye import save_calibration
+
 from typing import Tuple
 
 logging.basicConfig(level=logging.DEBUG)
@@ -162,13 +164,14 @@ def do_calibrate(
         image_size=image_size,
     )
 
-    np.savez_compressed(
+    save_calibration(
         calibration_file,
         K=K,
         D=D,
         image_size=image_size,
-        seed=salt,
-        k=pick_size,
+        salt=salt,
+        pick_size=pick_size,
+        error=rms,
     )
 
     print(f'DIM={image_size}')
