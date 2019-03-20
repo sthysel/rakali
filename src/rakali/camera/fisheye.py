@@ -12,9 +12,9 @@ def save_calibration(
     K,
     D,
     image_size,
-    salt,
-    pick_size,
-    error,
+    salt: int,
+    pick_size: int,
+    error: float,
 ):
     """Save fisheye calibation to file"""
 
@@ -31,7 +31,7 @@ def save_calibration(
 
 
 def load_calibration(calibration_file):
-    """Load fisheye calibration data"""
+    """Load fisheye calibration data from file"""
 
     print(f'Loading fisheye calibration data from {calibration_file}')
     cal = np.load(calibration_file)
@@ -50,11 +50,11 @@ def get_maps(
     calibration_dim,
     K,
     D,
-    balance=0.5,
+    balance: float = 0.5,
     dim2=None,
     dim3=None,
 ):
-    """ calculate fish-eye reprojection maps"""
+    """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
     assert dim1[0] / dim1[1] == calibration_dim[0] / calibration_dim[
@@ -70,19 +70,19 @@ def get_maps(
 
     # use scaled_K, dim2 and balance to determine the final K used to un-distort image
     new_K = cv.fisheye.estimateNewCameraMatrixForUndistortRectify(
-        scaled_K,
-        D,
-        dim2,
-        np.eye(3),
+        K=scaled_K,
+        D=D,
+        image_size=dim2,
+        R=np.eye(3),
         balance=balance,
     )
     map1, map2 = cv.fisheye.initUndistortRectifyMap(
-        scaled_K,
-        D,
-        np.eye(3),
-        new_K,
-        dim3,
-        cv.CV_16SC2,
+        K=scaled_K,
+        D=D,
+        R=np.eye(3),
+        P=new_K,
+        size=dim3,
+        m1type=cv.CV_16SC2,
     )
     return map1, map2
 
@@ -92,9 +92,9 @@ def undistort(img, map1, map2):
     """undistort fisheye image"""
 
     undistorted_img = cv.remap(
-        img,
-        map1,
-        map2,
+        src=img,
+        map1=map1,
+        map2=map2,
         interpolation=cv.INTER_LINEAR,
         borderMode=cv.BORDER_CONSTANT,
     )
