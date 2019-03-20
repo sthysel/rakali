@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_zero_object(pattern_size=(9, 6), square_size=0.023):
-    columns, rows = pattern_size
+    rows, columns = pattern_size  # no
     objp = np.zeros((1, rows * columns, 3), np.float32)
     objp[0, :, :2] = np.mgrid[0:rows, 0:columns].T.reshape(-1, 2)
     return objp
@@ -44,14 +44,14 @@ def load_image_points_file(save_file) -> Tuple[list, list, tuple]:
 
     try:
         cache = np.load(save_file)
-        logger.debug(f'Loading previously computed image points from {save_file}')
+        print(f'Loading previously computed image points from {save_file}')
         return (
             list(cache['object_points']),
             list(cache['image_points']),
             tuple(cache['image_size']),
         )
     except IOError:
-        logger.warning(f'{save_file} not found')
+        print(f'{save_file} not found')
         return None
 
 
@@ -59,7 +59,7 @@ def get_points_from_chessboard_images(boards_path, chessboard_size, square_size)
     """
     Process folder with chesboard images and gather image points
     """
-    logging.debug('Processing chessboard images...')
+    print('Processing chessboard images...')
 
     def check_size(image, image_size):
         if image_size is None:
@@ -87,7 +87,7 @@ def get_points_from_chessboard_images(boards_path, chessboard_size, square_size)
             image_points.append(corners)
             object_points.append(zero)
         else:
-            logger.info(f'Ignoring {fname}')
+            print(f'Ignoring {fname}')
 
     h, w = image_size
     return object_points, image_points, (w, h)
@@ -97,15 +97,15 @@ def calibrate(object_points, image_points, image_size):
     """
     Calibrate the pinhole camera using image points
     """
-    N_OK = len(object_points)
-    logging.debug(f'Calibrating on {N_OK} objects...')
+    obj_length = len(object_points)
+    print(f'Calibrating on {obj_length} objects...')
 
     calibration_flags = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
     # zero holders
     K = np.zeros((3, 3))
     D = np.zeros((4, 1))
-    rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-    tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+    rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(obj_length)]
+    tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(obj_length)]
 
     rms, _, _, _, _ = cv.fisheye.calibrate(
         objectPoints=object_points,

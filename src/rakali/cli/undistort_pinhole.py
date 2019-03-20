@@ -58,21 +58,21 @@ def undistort(img, calibration):
     '-s',
     '--source',
     help='Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
-    default="rtsp://10.41.212.144/axis-media/media.amp?camera=1",
+    default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1",
     show_default=True,
 )
 @click.option(
     '--calibration-file',
     help='Camera calibration data',
-    default='calibration.npz',
+    default='pinhole_calibration.npz',
     show_default=True,
 )
 def cli(source, calibration_file):
+    """ Undistort live feed from pinhole model type camera """
 
-    CALIBRATION = '~/calib/pinhole/left/calibration.npz'
-    calibration_file = Path(CALIBRATION).expanduser()
+    calibration_path = Path(calibration_file).expanduser()
 
-    calibration = load_calibration(calibration_file=calibration_file)
+    calibration = load_calibration(calibration_file=calibration_path)
     stream = VideoFile(src=str(source))
     player = VideoPlayer()
 

@@ -2,12 +2,12 @@
 Discover IP cameras on local LAN
 """
 
-from pprint import pprint
 import nmap
 import click
 from ipaddress import ip_interface
 
 import socket
+from ..discover import discover
 
 
 def my_ip():
@@ -26,8 +26,31 @@ def get_local_net():
     return ip_interface(my_ip() + '/24').network
 
 
-@click.command(context_settings=dict(max_content_width=120))
+@click.group(context_settings=dict(max_content_width=120))
 @click.version_option()
+def cli():
+    """ """
+    pass
+
+
+@cli.command('service')
+@click.option(
+    '-s',
+    '--service',
+    help='Look for service',
+    default='axis',
+    show_default=True,
+)
+def service():
+    """
+    Scanning for video feed services
+    """
+
+    print(f'Scanning {local_lan} for {vendor_name} cameras or NVRs')
+    discover()
+
+
+@cli.command('cams')
 @click.option(
     '-n',
     '--vendor-name',
@@ -42,7 +65,7 @@ def get_local_net():
     default=get_local_net(),
     show_default=True,
 )
-def cli(vendor_name, local_lan):
+def cams(vendor_name, local_lan):
     """
     Discover local IP cameras using vendor name
     """
