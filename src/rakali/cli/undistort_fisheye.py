@@ -1,70 +1,11 @@
 import click
-import cv2
 import numpy as np
 
 from rakali import VideoPlayer
 from rakali.video import VideoFile, go
-from rakali.video.fps import cost
 from rakali.annotate import add_frame_labels, colors
 
-from rakali.camera.fisheye import load_calibration
-
-
-def get_maps(
-    img,
-    calibration_dim,
-    K,
-    D,
-    balance=0.5,
-    dim2=None,
-    dim3=None,
-):
-    """ calculate fish-eye reprojection maps"""
-
-    dim1 = img.shape[:2][::-1]
-    assert dim1[0] / dim1[1] == calibration_dim[0] / calibration_dim[
-        1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
-
-    if not dim2:
-        dim2 = dim1
-    if not dim3:
-        dim3 = dim1
-    # The values of K is to scale with image dimension.
-    scaled_K = K * dim1[0] / calibration_dim[0]
-    scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
-
-    # use scaled_K, dim2 and balance to determine the final K used to un-distort image
-    new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
-        scaled_K,
-        D,
-        dim2,
-        np.eye(3),
-        balance=balance,
-    )
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(
-        scaled_K,
-        D,
-        np.eye(3),
-        new_K,
-        dim3,
-        cv2.CV_16SC2,
-    )
-    return map1, map2
-
-
-@cost
-def undistort(img, map1, map2):
-    """undistort fisheye image"""
-
-    undistorted_img = cv2.remap(
-        img,
-        map1,
-        map2,
-        interpolation=cv2.INTER_LINEAR,
-        borderMode=cv2.BORDER_CONSTANT,
-    )
-
-    return undistorted_img
+from rakali.camera import fisheye
 
 
 @click.command(context_settings=dict(max_content_width=120))
@@ -93,7 +34,7 @@ def cli(source, calibration_file, balance):
     """
     Undistort live video feed from fish-eye lens camera
     """
-    calibration = load_calibration(calibration_file=calibration_file)
+    calibration = fisheye.load_calibration(calibration_file=calibration_file)
     calibration_dim = calibration['image_size']
     K = calibration['K']
     D = calibration['D']
@@ -102,7 +43,7 @@ def cli(source, calibration_file, balance):
 
     with stream, player:
         _, frame = stream.read()
-        map1, map2 = get_maps(
+        map1, map2 = fisheye.get_maps(
             frame,
             calibration_dim,
             K,
@@ -116,10 +57,10 @@ def cli(source, calibration_file, balance):
             ok, frame = stream.read()
             if ok:
                 frame_count += 1
-                undistorted_frame = undistort(img=frame, map1=map1, map2=map2)
+                undistorted_frame = fisheye.undistort(img=frame, map1=map1, map2=map2)
                 labels = [
                     f'Reprojected fisheye frame {frame_count}',
-                    f'undistort cost: {undistort.cost:6.3f}ms',
+                    f'undistort cost: {fisheye.undistort.cost:6.3f}ms',
                     f'balance {balance}',
                     # f'dim2 {dim2}',
                     # f'dim3 {dim3}',

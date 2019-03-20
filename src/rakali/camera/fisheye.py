@@ -45,11 +45,19 @@ def load_calibration(calibration_file):
     )
 
 
-def xxxxundistort(img, balance=0.5, dim2=None, dim3=None):
-    """undistort fisheye image"""
+def get_maps(
+    img,
+    calibration_dim,
+    K,
+    D,
+    balance=0.5,
+    dim2=None,
+    dim3=None,
+):
+    """ calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
-    assert dim1[0] / dim1[1] == DIM[0] / DIM[
+    assert dim1[0] / dim1[1] == calibration_dim[0] / calibration_dim[
         1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
     if not dim2:
@@ -57,7 +65,7 @@ def xxxxundistort(img, balance=0.5, dim2=None, dim3=None):
     if not dim3:
         dim3 = dim1
     # The values of K is to scale with image dimension.
-    scaled_K = K * dim1[0] / DIM[0]
+    scaled_K = K * dim1[0] / calibration_dim[0]
     scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
 
     # use scaled_K, dim2 and balance to determine the final K used to un-distort image
@@ -76,6 +84,13 @@ def xxxxundistort(img, balance=0.5, dim2=None, dim3=None):
         dim3,
         cv.CV_16SC2,
     )
+    return map1, map2
+
+
+@cost
+def undistort(img, map1, map2):
+    """undistort fisheye image"""
+
     undistorted_img = cv.remap(
         img,
         map1,
@@ -84,89 +99,4 @@ def xxxxundistort(img, balance=0.5, dim2=None, dim3=None):
         borderMode=cv.BORDER_CONSTANT,
     )
 
-    labels = [
-        f'undistort cost: {undistort.cost:6.3f}ms',
-        f'balance {balance}',
-        f'dim2 {dim2}',
-        f'dim3 {dim3}',
-    ]
-    labeled_image = add_frame_labels(
-        frame=undistorted_img,
-        labels=labels,
-        color=colors.get('BHP'),
-    )
-
-    return np.hstack((img, labeled_image))
-
-
-class CorrectFishEye:
-    def __init__(
-        self,
-        image_size,
-        balance=1.0,
-        dim2=None,
-        dim3=None,
-    ):
-        self.image_size = image_size
-        self.balance = balance
-        self.dim2 = dim2
-        self.dim3 = dim3
-
-    def remap(self):
-        """ calculate remap matrix"""
-
-        dim1 = self.image_size
-        assert dim1[0] / dim1[1] == DIM[0] / DIM[
-            1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
-
-        if not dim2:
-            dim2 = dim1
-        if not dim3:
-            dim3 = dim1
-        # The values of K is to scale with image dimension.
-        scaled_K = K * dim1[0] / DIM[0]
-        scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
-
-        # use scaled_K, dim2 and balance to determine the final K used to un-distort image
-        new_K = cv.fisheye.estimateNewCameraMatrixForUndistortRectify(
-            scaled_K,
-            D,
-            dim2,
-            np.eye(3),
-            balance=balance,
-        )
-        map1, map2 = cv.fisheye.initUndistortRectifyMap(
-            scaled_K,
-            D,
-            np.eye(3),
-            new_K,
-            dim3,
-            cv.CV_16SC2,
-        )
-        return map1, map2
-
-    @cost
-    def undistort(img, map1, map2):
-        """undistort fisheye image"""
-
-        undistorted_img = cv.remap(
-            img,
-            map1,
-            map2,
-            interpolation=cv.INTER_LINEAR,
-            borderMode=cv.BORDER_CONSTANT,
-        )
-
-        labels = [
-            f'undistort cost: {undistort.cost:6.3f}ms',
-            f'balance {balance}',
-            f'dim2 {dim2}',
-            f'dim3 {dim3}',
-        ]
-        labeled_image = add_frame_labels(
-            frame=undistorted_img,
-            labels=labels,
-            color=colors.get('BHP'),
-        )
-
-        return np.hstack((img, labeled_image))
+    return undistorted_img
