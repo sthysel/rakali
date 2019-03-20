@@ -5,7 +5,7 @@ import numpy as np
 
 import click
 
-from rakali.video import VideoFile, go
+from rakali.video import go
 from rakali.stereo.reader import StereoCamera
 
 from rakali import VideoPlayer
