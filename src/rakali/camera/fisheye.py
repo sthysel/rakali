@@ -5,13 +5,14 @@ Fisheye camera support
 import cv2 as cv
 import numpy as np
 from rakali.video.fps import cost
+from typing import Tuple
 
 
 def save_calibration(
-    calibration_file,
+    calibration_file: str,
     K,
     D,
-    image_size,
+    image_size: Tuple[int, int],
     salt: int,
     pick_size: int,
     error: float,

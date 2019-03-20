@@ -48,7 +48,6 @@ class VideoFrameEnqueuer(Thread):
     """
     Loads images into a queue for processing by consumers.
     If a queue is not injected, create one.
-    Seems like OpenCV can load frames way faster in a thread out of the main thread
     """
 
     def __init__(self, src=0, q=None):
@@ -105,10 +104,11 @@ class VideoStream:
     Use this when real-time processing is required
     """
 
-    def __init__(self, src=0):
+    def __init__(self, src=0, name='video stream'):
         self.stream = cv.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
+        self.name = name
 
         # ensure a frame is ready by faking it up, this saves a lot of ugly
         # fencing code later on

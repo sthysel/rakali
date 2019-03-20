@@ -1,0 +1,3 @@
+"""
+Stereo camera support
+"""
