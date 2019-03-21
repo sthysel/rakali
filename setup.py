@@ -26,6 +26,7 @@ setup(
             'rakali-undistort-fisheye=rakali.cli.undistort_fisheye:cli',
             'rakali-view=rakali.cli.view_feed:cli',
             'rakali-stereo-view=rakali.cli.view_stereo_feed:cli',
+            'rakali-split-stereo-feed=rakali.cli.split_feed:cli',
         ],
     },
     install_requires=[

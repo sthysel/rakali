@@ -47,6 +47,12 @@ class StereoFrame:
     def is_good(self):
         return (self.left is not None) and (self.right is not None)
 
+    def get_stereo_frame_size(self) -> Tuple[int, int]:
+        """the size of a horizontally stacked stereo frame"""
+
+        h, w = self.left.shape[:2]
+        return (w * 2, h)
+
 
 class StereoCamera:
     """
