@@ -36,17 +36,27 @@ def cli(source, left_name, right_name):
     Split source stereo recording into left and right camera views
     """
 
+    print(f'Decomposing stereo video file {source} into {left_name}, {right_name}')
     l_writer = VideoWriter(file_name=left_name)
     r_writer = VideoWriter(file_name=right_name)
 
     infile = VideoFile(source)
 
-    while True:
-        ok, frame = infile.read()
+    print('Calculate size...')
+    ok, frame = infile.read()
+    if ok:
         h, w = frame.shape[:2]
         hw = int(w / 2)
-        left = frame[0:h, 0:hw]
-        right = frame[0:h, hw:w]
 
-        l_writer.write(left)
-        r_writer.write(right)
+    print('Splitting....')
+    while True:
+        ok, frame = infile.read()
+        if ok:
+            left = frame[0:h, 0:hw]
+            right = frame[0:h, hw:w]
+
+            l_writer.write(left)
+            r_writer.write(right)
+        else:
+            break
+    print('Done.')
