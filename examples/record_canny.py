@@ -28,7 +28,12 @@ def canny(img):
 
 
 stream = VideoStream(src=0)
-writer = VideoWriter(size=stream.get_wh_size(), file_name='canny.avi')
+writer = VideoWriter(
+    size=stream.get_wh_size(),
+    file_name='canny.avi',
+    color=False,
+    fps=60,
+)
 player = VideoPlayer()
 
 with stream, player, writer:
