@@ -107,7 +107,7 @@ class VideoStream(Thread):
     def __init__(self, src=0, name='video stream'):
         super().__init__()
 
-        self.stream = cv.VideoCapture(self._pick_src(src))
+        self.stream = cv.VideoCapture(self._pick_source(src))
         self.grabbed, self.frame = self.stream.read()
         self.stopped = False
         self.name = name
@@ -120,24 +120,24 @@ class VideoStream(Thread):
 
         self.frame_count = 0
 
-    def _pick_src(self, src):
+    def _pick_source(self, source):
         """
-        click passes in src name as str, but usb vid cams are valid as well,
+        click passes in source name as str, but usb vid cams are valid as well,
         and those are ints
         """
-        if isinstance(src, int):
-            return src
-        elif isinstance(src, str):
-            src = src.strip()
-            if len(src) > 1:
-                return src
-            if len(src) == 1:
+        if isinstance(source, int):
+            return source
+        elif isinstance(source, str):
+            source = source.strip()
+            if len(source) > 1:
+                return source
+            if len(source) == 1:
                 try:
-                    return int(str)
+                    return int(source)
                 except ValueError:
-                    return src
+                    return source
             else:
-                return src
+                return source
 
     def size(self):
         return self.width, self.height
