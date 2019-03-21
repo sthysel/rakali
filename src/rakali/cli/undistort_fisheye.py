@@ -61,51 +61,7 @@ def cli(source, calibration_file, balance):
                 undistorted_frame = camera.correct(frame)
                 labels = [
                     f'Reprojected fisheye frame {frame_count}',
-                    f'undistort cost: {camera.correct.cost:6.3f}ms',
-                    f'balance {balance}',
-                    # f'dim2 {dim2}',
-                    # f'dim3 {dim3}',
-                ]
-                labeled_frame = add_frame_labels(
-                    frame=undistorted_frame,
-                    labels=labels,
-                    color=colors.get('BHP'),
-                )
-                stack = np.hstack((frame, labeled_frame))
-                player.show(stack)
-
-
-def cliold(source, calibration_file, balance):
-    """
-    Undistort live video feed from fish-eye lens camera
-    """
-    calibration = fisheye.load_calibration(calibration_file=calibration_file)
-    calibration_dim = calibration['image_size']
-    K = calibration['K']
-    D = calibration['D']
-    stream = VideoFile(src=str(source))
-    player = VideoPlayer()
-
-    with stream, player:
-        _, frame = stream.read()
-        map1, map2 = fisheye.get_maps(
-            frame,
-            calibration_dim,
-            K,
-            D,
-            balance,
-            dim2=None,
-            dim3=None,
-        )
-        frame_count = 0
-        while go():
-            ok, frame = stream.read()
-            if ok:
-                frame_count += 1
-                undistorted_frame = fisheye.undistort(img=frame, map1=map1, map2=map2)
-                labels = [
-                    f'Reprojected fisheye frame {frame_count}',
-                    f'undistort cost: {fisheye.undistort.cost:6.3f}ms',
+                    f'undistort cost: {camera.correct.cost:6.3f}s',
                     f'balance {balance}',
                     # f'dim2 {dim2}',
                     # f'dim3 {dim3}',

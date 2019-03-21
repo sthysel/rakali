@@ -140,6 +140,7 @@ class CalibratedFisheyeCamera:
         else:
             logger.error('Load calibration before setting the map')
 
+    @cost
     def correct(self, frame):
         """undistort frame"""
         return undistort(frame, self.map1, self.map2)
