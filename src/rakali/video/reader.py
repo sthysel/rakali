@@ -96,7 +96,7 @@ class VideoFrameEnqueuer(Thread):
         self.stopped = True
 
 
-class VideoStream:
+class VideoStream(Thread):
     """
     Live video stream. This reader reads as fast as the stream can provide,
     overriding the previous frame.
@@ -105,8 +105,10 @@ class VideoStream:
     """
 
     def __init__(self, src=0, name='video stream'):
-        self.stream = cv.VideoCapture(src)
-        (self.grabbed, self.frame) = self.stream.read()
+        super().__init__()
+
+        self.stream = cv.VideoCapture(self._pick_src(src))
+        self.grabbed, self.frame = self.stream.read()
         self.stopped = False
         self.name = name
 
@@ -115,6 +117,27 @@ class VideoStream:
         self.width = int(self.stream.get(cv.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.stream.get(cv.CAP_PROP_FRAME_HEIGHT))
         self.frame = np.zeros((self.height, self.width, 3), np.uint8)
+
+        self.frame_count = 0
+
+    def _pick_src(self, src):
+        """
+        click passes in src name as str, but usb vid cams are valid as well,
+        and those are ints
+        """
+        if isinstance(src, int):
+            return src
+        elif isinstance(src, str):
+            src = src.strip()
+            if len(src) > 1:
+                return src
+            if len(src) == 1:
+                try:
+                    return int(str)
+                except ValueError:
+                    return src
+            else:
+                return src
 
     def size(self):
         return self.width, self.height
@@ -128,13 +151,11 @@ class VideoStream:
     def get_shape(self):
         return self.frame.shape
 
-    def start(self):
-        Thread(target=self.update, args=()).start()
-        return self
-
-    def update(self):
+    def run(self):
         while not self.stopped:
             self.grabbed, self.frame = self.stream.read()
+            self.frame_count += 1
+        self.stream.release()
 
     @cost
     def read(self):
@@ -156,4 +177,4 @@ class VideoStream:
         return self
 
     def __exit__(self, type, value, traceback):
-        self.stop()
+        self.stopped = True

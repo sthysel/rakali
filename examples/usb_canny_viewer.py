@@ -11,7 +11,7 @@ def canny(mat):
     img = imutils.auto_canny(image=mat, sigma=0.3)
     img = add_frame_labels(
         frame=img,
-        labels=[f'canny cost: {canny.cost:6.3f}ms'],
+        labels=[f'canny cost: {canny.cost:6.3f}s'],
         color=colors.get('WHITE'),
     )
     return img

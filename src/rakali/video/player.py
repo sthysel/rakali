@@ -58,6 +58,7 @@ class VideoPlayer:
                     cv.imshow(self.window_name, img)
                 else:
                     print('No more frames')
+                    sys.exit()
 
         cv.destroyAllWindows()
         sys.exit()

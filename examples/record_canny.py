@@ -14,22 +14,27 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 @cost
-def canny(mat):
-    img = imutils.auto_canny(image=mat, sigma=0.3)
+def canny(img):
+    img = imutils.auto_canny(image=img, sigma=0.3)
     img = add_frame_labels(
         frame=img,
-        labels=[f'canny cost: {canny.cost:6.3f}ms'],
+        labels=[
+            f'canny cost: {canny.cost:6.3f}s',
+            'q to quit',
+        ],
         color=colors.get('WHITE'),
     )
     return img
 
 
 stream = VideoStream(src=0)
-player = VideoPlayer()
 writer = VideoWriter(size=stream.get_wh_size(), file_name='canny.avi')
+player = VideoPlayer()
 
 with stream, player, writer:
     while go():
-        frame = canny(stream.read())
-        writer.write(frame)
-        player.show(frame)
+        ok, frame = stream.read()
+        if ok:
+            frame = canny(frame)
+            writer.write(frame)
+            player.show(frame)

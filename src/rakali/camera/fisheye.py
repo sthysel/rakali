@@ -6,6 +6,7 @@ import cv2 as cv
 import numpy as np
 from rakali.video.fps import cost
 from typing import Tuple
+from pathlib import Path
 
 import logging
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ def load_calibration(calibration_file):
 
 def get_maps(
     img,
-    calibration_dim,
+    image_size,
     K,
     D,
     balance: float = 0.5,
@@ -59,7 +60,7 @@ def get_maps(
     """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
-    assert dim1[0] / dim1[1] == calibration_dim[0] / calibration_dim[
+    assert dim1[0] / dim1[1] == image_size[0] / image_size[
         1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
     if not dim2:
@@ -67,7 +68,7 @@ def get_maps(
     if not dim3:
         dim3 = dim1
     # The values of K is to scale with image dimension.
-    scaled_K = K * dim1[0] / calibration_dim[0]
+    scaled_K = K * dim1[0] / image_size[0]
     scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
 
     # use scaled_K, dim2 and balance to determine the final K used to un-distort image
@@ -104,22 +105,41 @@ def undistort(img, map1, map2):
     return undistorted_img
 
 
-class FisheyeCamera:
-    """ A fishey camera """
+class CalibratedFisheyeCamera:
+    """ A Calibrated fish-eye camera """
 
-    def __init__(self, name='fisheye'):
+    def __init__(
+        self,
+        calibration_file,
+        balance,
+        dim2=None,
+        dim3=None,
+        name='fisheye',
+    ):
+        self.balance = balance
         self.name = name
-
-        self.calibration = None
-
-    def load(self, calibration_file):
-        """Load the calibration file"""
-        self.calibration = load_calibration(calibration_file=calibration_file)
+        self.dim2 = dim2
+        self.dim3 = dim3
+        if Path(calibration_file).exists():
+            self.calibration = load_calibration(calibration_file=calibration_file)
+        else:
+            logger.error(f'Calibration file {calibration_file} does not exist')
 
     def set_map(self, first_frame):
         """set the maps"""
         if self.calibration:
-            self.map1, self.map2 = get_maps(img=first_frame, **self.calibration)
+            self.map1, self.map2 = get_maps(
+                img=first_frame,
+                image_size=self.calibration['image_size'],
+                K=self.calibration['K'],
+                D=self.calibration['D'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
         else:
             logger.error('Load calibration before setting the map')
 
+    def correct(self, frame):
+        """undistort frame"""
+        return undistort(frame, self.map1, self.map2)

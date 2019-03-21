@@ -24,7 +24,7 @@ def decorate_frame(frame, source):
     )
     return img
 
-# http://axis-lab/view/view.shtml?id=97&imagePath=%2Fmjpg%2Fvideo.mjpg%3Fcamera%3D1&size=1
+
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.option(

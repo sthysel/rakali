@@ -2,10 +2,11 @@ import click
 import numpy as np
 
 from rakali import VideoPlayer
-from rakali.video import VideoFile, go
+from rakali.video import VideoFile, go, VideoStream
 from rakali.annotate import add_frame_labels, colors
+from rakali.camera.fisheye import CalibratedFisheyeCamera
 
-from rakali.camera import fisheye
+import sys
 
 
 @click.command(context_settings=dict(max_content_width=120))
@@ -31,6 +32,50 @@ from rakali.camera import fisheye
     show_default=True,
 )
 def cli(source, calibration_file, balance):
+    """
+    Undistort live video feed from fish-eye lens camera
+    """
+
+    camera = CalibratedFisheyeCamera(
+        calibration_file=calibration_file,
+        balance=balance,
+        dim2=None,
+        dim3=None,  # remember we have these
+    )
+    stream = VideoStream(src=source)
+    player = VideoPlayer()
+
+    with stream, player:
+        ok, frame = stream.read()
+        if ok:
+            camera.set_map(first_frame=frame)
+        else:
+            print('Cannot read video feed')
+            sys.exit(0)
+
+        frame_count = 0
+        while go():
+            ok, frame = stream.read()
+            if ok:
+                frame_count += 1
+                undistorted_frame = camera.correct(frame)
+                labels = [
+                    f'Reprojected fisheye frame {frame_count}',
+                    f'undistort cost: {camera.correct.cost:6.3f}ms',
+                    f'balance {balance}',
+                    # f'dim2 {dim2}',
+                    # f'dim3 {dim3}',
+                ]
+                labeled_frame = add_frame_labels(
+                    frame=undistorted_frame,
+                    labels=labels,
+                    color=colors.get('BHP'),
+                )
+                stack = np.hstack((frame, labeled_frame))
+                player.show(stack)
+
+
+def cliold(source, calibration_file, balance):
     """
     Undistort live video feed from fish-eye lens camera
     """

@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
-from rakali import Image
-img = Image.from_file('rakali.jpg')
-img.info()
-img.show()
+from rakali.testimages import orb_spider, rakali
+
+for image in (orb_spider, rakali):
+    image.info()
+    image.show()
