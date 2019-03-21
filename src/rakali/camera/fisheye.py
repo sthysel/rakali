@@ -7,6 +7,9 @@ import numpy as np
 from rakali.video.fps import cost
 from typing import Tuple
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def save_calibration(
     calibration_file: str,
@@ -18,8 +21,7 @@ def save_calibration(
     error: float,
 ):
     """Save fisheye calibation to file"""
-
-    print(f'Saving fisheye calibration data to {calibration_file}')
+    logger.info(f'Saving fisheye calibration data to {calibration_file}')
     np.savez_compressed(
         calibration_file,
         K=K,
@@ -33,8 +35,7 @@ def save_calibration(
 
 def load_calibration(calibration_file):
     """Load fisheye calibration data from file"""
-
-    print(f'Loading fisheye calibration data from {calibration_file}')
+    logger.info(f'Loading fisheye calibration data from {calibration_file}')
     cal = np.load(calibration_file)
     return dict(
         K=cal['K'],
@@ -101,3 +102,24 @@ def undistort(img, map1, map2):
     )
 
     return undistorted_img
+
+
+class FisheyeCamera:
+    """ A fishey camera """
+
+    def __init__(self, name='fisheye'):
+        self.name = name
+
+        self.calibration = None
+
+    def load(self, calibration_file):
+        """Load the calibration file"""
+        self.calibration = load_calibration(calibration_file=calibration_file)
+
+    def set_map(self, first_frame):
+        """set the maps"""
+        if self.calibration:
+            self.map1, self.map2 = get_maps(img=first_frame, **self.calibration)
+        else:
+            logger.error('Load calibration before setting the map')
+

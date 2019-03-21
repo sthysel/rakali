@@ -31,14 +31,20 @@ from rakali.video.writer import VideoWriter
     default='right_eye_out.avi',
     show_default=True,
 )
-def cli(source, left_name, right_name):
+@click.option(
+    '--fps',
+    help='Frames per second rate for output file',
+    default=12.5,
+    show_default=True,
+)
+def cli(source, left_name, right_name, fps):
     """
     Split source stereo recording into left and right camera views
     """
 
     print(f'Decomposing stereo video file {source} into {left_name}, {right_name}')
-    l_writer = VideoWriter(file_name=left_name)
-    r_writer = VideoWriter(file_name=right_name)
+    l_writer = VideoWriter(file_name=left_name, fps=fps)
+    r_writer = VideoWriter(file_name=right_name, fps=fps)
 
     infile = VideoFile(source)
 
