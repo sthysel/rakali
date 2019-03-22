@@ -2,6 +2,7 @@
 Support for pinhole camera
 """
 
+from rakali.video.fps import cost
 import sys
 import numpy as np
 import cv2 as cv
@@ -135,3 +136,58 @@ def reprojection_error(
         total_error += error
 
     return total_error / length
+
+
+def save_calibration(
+    calibration_file: str,
+    camera_matrix,
+    new_camera_matrix,
+    roi,
+    distortion_coefficients,
+    rotation,
+    translation,
+    salt,
+    pick_size,
+    error,
+):
+    """Save pinhole calibration to file """
+    np.savez_compressed(
+        calibration_file,
+        camera_matrix=camera_matrix,
+        new_camera_matrix=new_camera_matrix,
+        roi=roi,
+        distortion_coefficients=distortion_coefficients,
+        rotation=rotation,
+        translation=translation,
+        salt=salt,
+        pick_size=pick_size,
+        error=error,
+    )
+
+
+def load_calibration(calibration_file):
+    """Load pinhole calibration"""
+    logger.debug(f'Loading calibration data from {calibration_file}')
+    cal = np.load(calibration_file)
+    return dict(
+        camera_matrix=cal['camera_matrix'],
+        new_camera_matrix=cal['new_camera_matrix'],
+        roi=cal['roi'],
+        distortion_coefficients=cal['distortion_coefficients'],
+        rotation=cal['rotation'],
+        translation=cal['translation'],
+        salt=int(cal['salt']),
+        pick_size=int(cal['pick_size']),
+        error=float(cal['error']),
+    )
+
+@cost
+def undistort(img, calibration):
+    img = cv.undistort(
+        src=img,
+        cameraMatrix=calibration['camera_matrix'],
+        distCoeffs=calibration['distortion_coefficients'],
+        dst=None,
+        newCameraMatrix=calibration['new_camera_matrix'],
+    )
+    return img

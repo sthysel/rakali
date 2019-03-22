@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--image-points-file',
     help='Corner points data',
-    default='fisheye_image_points.npz',
+    default='image_points.npz',
     show_default=True,
 )
 @click.option(
