@@ -11,7 +11,6 @@ import numpy as np
 
 from rakali.video.fps import cost
 
-
 logger = logging.getLogger(__name__)
 
 CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
@@ -157,6 +156,12 @@ class CalibratedFisheyeCamera:
             self.calibration = load_calibration(calibration_file=calibration_file)
         else:
             logger.error(f'Calibration file {calibration_file} does not exist')
+            self.calibration = None
+
+    def set_calibration(self, calibration):
+        """set calibration"""
+        # TODO validate
+        self.calibration = calibration
 
     def set_map(self, first_frame):
         """set the maps"""

@@ -22,6 +22,7 @@ import sys
     '--calibration-file',
     help='Camera calibration data',
     default='fisheye_calibration.npz',
+    type=click.File('r'),
     show_default=True,
 )
 @click.option(
