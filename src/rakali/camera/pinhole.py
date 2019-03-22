@@ -8,6 +8,7 @@ import numpy as np
 import cv2 as cv
 import glob
 import logging
+from pathlib import Path
 from rakali.camera.chessboard import ChessboardFinder
 
 logging.basicConfig(level=logging.DEBUG)
@@ -181,6 +182,7 @@ def load_calibration(calibration_file):
         error=float(cal['error']),
     )
 
+
 @cost
 def undistort(img, calibration):
     img = cv.undistort(
@@ -191,3 +193,23 @@ def undistort(img, calibration):
         newCameraMatrix=calibration['new_camera_matrix'],
     )
     return img
+
+
+class CalibratedPinholeCamera:
+    """ A calibrated pinhole camera """
+
+    def __init__(
+        self,
+        calibration_file,
+        name='pinhole',
+    ):
+        self.name = name
+        if Path(calibration_file).exists():
+            self.calibration = load_calibration(calibration_file=calibration_file)
+        else:
+            logger.error(f'Calibration file {calibration_file} does not exist')
+
+    @cost
+    def correct(self, frame):
+        """undistort frame"""
+        return undistort(frame, self.calibration)

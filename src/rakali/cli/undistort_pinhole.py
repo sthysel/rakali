@@ -8,7 +8,7 @@ from pathlib import Path
 import click
 
 from rakali import VideoPlayer
-from rakali.camera import pinhole
+from rakali.camera.pinhole import CalibratedPinholeCamera
 from rakali.video import VideoFile, go
 from rakali.annotate import add_frame_labels, colors
 
@@ -37,7 +37,7 @@ def cli(source, calibration_file):
 
     calibration_path = Path(calibration_file).expanduser()
 
-    calibration = pinhole.load_calibration(calibration_file=calibration_path)
+    camera = CalibratedPinholeCamera(calibration_file=calibration_path)
     stream = VideoFile(src=str(source))
     player = VideoPlayer()
 
@@ -45,10 +45,10 @@ def cli(source, calibration_file):
         while go():
             ok, frame = stream.read()
             if ok:
-                frame = pinhole.undistort(img=frame, calibration=calibration)
+                frame = camera.correct(frame)
                 frame = add_frame_labels(
                     frame=frame,
-                    labels=[f'undistort cost: {pinhole.undistort.cost:6.3f}s'],
-                    color=colors.get('WHITE'),
+                    labels=[f'undistort cost: {camera.correct.cost:6.3f}s'],
+                    color=colors.get('BHP'),
                 )
                 player.show(frame)
