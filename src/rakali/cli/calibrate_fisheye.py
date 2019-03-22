@@ -67,6 +67,12 @@ logger = logging.getLogger(__name__)
     default=50,
     show_default=True,
 )
+@click.option(
+    '--cid',
+    help='Calibration ID to associate a calibration file with a device',
+    default='fisheye',
+    show_default=True,
+)
 def cli(
     input_folder,
     image_points_file,
@@ -76,6 +82,7 @@ def cli(
     square_size,
     salt,
     pick_size,
+    cid,
 ):
     """
     Calibrate fish-eye camera using chessboard frames captured earlier.
@@ -131,6 +138,7 @@ def cli(
         salt=salt,
         pick_size=pick_size,
         error=rms,
+        cid=cid,
     )
 
     print(f'DIM={image_size}')

@@ -3,6 +3,8 @@ Fisheye camera support
 """
 
 import logging
+import time
+from datetime import datetime
 from pathlib import Path
 from typing import Tuple
 
@@ -52,6 +54,7 @@ def save_calibration(
     salt: int,
     pick_size: int,
     error: float,
+    cid: str,
 ):
     """Save fisheye calibation to file"""
     logger.info(f'Saving fisheye calibration data to {calibration_file}')
@@ -63,6 +66,8 @@ def save_calibration(
         salt=salt,
         pick_size=pick_size,
         error=error,
+        cid=cid,
+        time=time.time(),
     )
 
 
@@ -77,6 +82,8 @@ def load_calibration(calibration_file):
         salt=int(cal['salt']),
         pick_size=int(cal['pick_size']),
         error=float(cal['error']),
+        cid=str(cal['cid']),
+        time=float(cal['time']),
     )
 
 
@@ -162,6 +169,27 @@ class CalibratedFisheyeCamera:
         """set calibration"""
         # TODO validate
         self.calibration = calibration
+
+    @property
+    def cid(self):
+        """calibration id"""
+        if self.calibration:
+            return self.calibration.get('cid', 'UNSET')
+        else:
+            return 'UNSET'
+
+    @property
+    def calibration_time(self):
+        """calibration time"""
+        if self.calibration:
+            return self.calibration.get('time', -1)
+        else:
+            return -1
+
+    @property
+    def calibration_time_formatted(self):
+        """ formated calibration time """
+        return datetime.fromtimestamp(self.calibration_time)
 
     def set_map(self, first_frame):
         """set the maps"""

@@ -22,7 +22,7 @@ import sys
     '--calibration-file',
     help='Camera calibration data',
     default='fisheye_calibration.npz',
-    type=click.File('r'),
+    type=click.Path(exists=True),
     show_default=True,
 )
 @click.option(
@@ -61,9 +61,10 @@ def cli(source, calibration_file, balance):
                 frame_count += 1
                 undistorted_frame = camera.correct(frame)
                 labels = [
-                    f'Reprojected fisheye frame {frame_count}',
+                    f'Reprojected fisheye frame: {frame_count}',
                     f'undistort cost: {camera.correct.cost:6.3f}s',
-                    f'balance {balance}',
+                    f'balance: {balance}',
+                    f'cid: {camera.cid} {camera.calibration_time_formatted}',
                     # f'dim2 {dim2}',
                     # f'dim3 {dim3}',
                 ]
