@@ -64,7 +64,7 @@ def cli(source, calibration_file, balance):
                     f'Reprojected fisheye frame: {frame_count}',
                     f'undistort cost: {camera.correct.cost:6.3f}s',
                     f'balance: {balance}',
-                    f'cid: {camera.cid} {camera.calibration_time_formatted}',
+                    f'cid: {camera.cid} calibrated on {camera.calibration_time_formatted}',
                     # f'dim2 {dim2}',
                     # f'dim3 {dim3}',
                 ]
