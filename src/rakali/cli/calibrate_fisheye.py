@@ -10,6 +10,7 @@ import logging
 
 # from rakali.camera.fisheye import save_calibration
 from rakali.camera import fisheye
+from rakali.camera import chessboard
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -92,16 +93,16 @@ def cli(
     chessboard_size = (chessboard_columns, chessboard_rows)
 
     # use previously computed image points if they are available
-    exiting_points = fisheye.load_image_points_file(image_points_file)
+    exiting_points = chessboard.load_image_points_file(image_points_file)
     if exiting_points:
         object_points, image_points, image_size = exiting_points
     else:
-        object_points, image_points, image_size = fisheye.get_points_from_chessboard_images(
+        object_points, image_points, image_size = chessboard.get_points_from_chessboard_images(
             boards_path=input_folder,
             chessboard_size=chessboard_size,
             square_size=square_size,
         )
-        fisheye.save_image_points_file(
+        chessboard.save_image_points_file(
             save_file=image_points_file,
             object_points=object_points,
             image_points=image_points,
