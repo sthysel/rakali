@@ -24,9 +24,9 @@ video cameras.
 
 Scan local LAN for IP cameras by vendor and service.
 
-```
-$  rakali-find-ipcameras cams
+`$ rakali-find-ipcameras cams`
 
+```
 Usage: rakali-find-ipcameras [OPTIONS] COMMAND [ARGS]...
 
   Discover IP cameras on local LAN
@@ -40,8 +40,9 @@ Commands:
   service  Scanning for video feed services
 ```
 
+`$ rakali-find-ipcameras cams `
+
 ```
-$ rakali-find-ipcameras cams 
 
 Scanning 10.41.212.0/24 for axis cameras or NVRs
 ['10.41.212.135', '10.41.212.147']
@@ -52,8 +53,10 @@ Scanning 10.41.212.0/24 for axis cameras or NVRs
 
 View feed from IP and USB cameras
 
+
+`$ rakali-view --help`
+
 ```
-$ rakali-view --help
 Usage: rakali-view [OPTIONS]
 
 Options:
@@ -66,17 +69,121 @@ Options:
 
 ## rakali-find-chessboards
 
+Find checkerboard images in video feed for calibration purposes
+
+`$ rakali-find-chessboards --help`
+
+```
+Usage: rakali-find-chessboards [OPTIONS]
+
+  Test each frame in the stream for the presence of a chess-board pattern. If found, save to the output folder
+
+Options:
+  --version                     Show the version and exit.
+  -s, --source TEXT             Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
+                                http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1]
+  -o, --output-folder TEXT      Fetch image from URL  [default: ~/rakali/chessboards/]
+  --chessboard-rows INTEGER     Chessboard rows  [default: 9]
+  --chessboard-columns INTEGER  Chessboard columns  [default: 6]
+  --help                        Show this message and exit.
+```
+
 ## rakali-find-chessboards-stereo
 
+Find checkerboard images in stereo video feed for calibration purposes
 
+`rakali-find-chessboards-stereo --help`
 
+```
+Usage: rakali-find-chessboards-stereo [OPTIONS]
+
+  Find chessboard calibration images in both frames of the stereo pair
+
+Options:
+  --version                     Show the version and exit.
+  -l, --left-eye TEXT           Left eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
+                                http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1]
+  -r, --right-eye TEXT          Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
+                                http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=2]
+  -o, --output-folder TEXT      Fetch image from URL  [default: ~/rakali/stereo/chessboards/]
+  --chessboard-rows INTEGER     Chessboard rows  [default: 9]
+  --chessboard-columns INTEGER  Chessboard columns  [default: 6]
+  --help                        Show this message and exit.
+```
+  
+  
 ## rakali-calibrate-pinhole
+
+Calibrate a video camera with a pinhole lens
+
+`$ rakali-calibrate-pinhole --help `
+
+```
+Usage: rakali-calibrate-pinhole [OPTIONS]
+
+  Calibrate pinhole camera using chessboard frames captured earlier.
+
+Options:
+  --version                     Show the version and exit.
+  -i, --input-folder TEXT       Folder where chessboard images are stored  [default: ~/rakali/chessboards/]
+  --image-points-file TEXT      Corner points data  [default: image_points.npz]
+  --calibration-file TEXT       Camera calibration data  [default: pinhole_calibration.npz]
+  --chessboard-rows INTEGER     Chessboard rows  [default: 9]
+  --chessboard-columns INTEGER  Chessboard columns  [default: 6]
+  --square-size FLOAT           Chessboard square size in m  [default: 0.023]
+  --salt INTEGER                Seed value for random picking of calibration images from a large set  [default: 888]
+  --pick-size INTEGER           Size of image set to use for calibration, picked from available set  [default: 50]
+  --help                        Show this message and exit.
+```
+
 
 ## rakali-calibrate-fisheye
 
+Calibrate a video camera with a fish-eye lens
+
+`$ rakali-calibrate-fisheye --help`
+
+```
+Usage: rakali-calibrate-fisheye [OPTIONS]
+
+  Calibrate fish-eye camera using chessboard frames captured earlier.
+
+Options:
+  --version                     Show the version and exit.
+  -i, --input-folder TEXT       Folder where chessboard images are stored  [default: ~/rakali/chessboards/]
+  --image-points-file TEXT      Corner points data  [default: image_points.npz]
+  --calibration-file TEXT       Camera calibration data  [default: fisheye_calibration.npz]
+  --chessboard-rows INTEGER     Chessboard rows  [default: 9]
+  --chessboard-columns INTEGER  Chessboard columns  [default: 6]
+  --square-size FLOAT           Chessboard square size in m  [default: 0.023]
+  --salt INTEGER                Seed value for random picking of calibration images from a large set  [default: 888]
+  --pick-size INTEGER           Size of image set to use for calibration, picked from available set  [default: 50]
+  --cid TEXT                    Calibration ID to associate a calibration file with a device  [default: fisheye]
+  --help                        Show this message and exit.
+  
+```
+
 ## rakali-undistort-pinhole
 
+Correct video feed from calibrated standard pinhole camera 
+
+`$ rakali-undistort-pinhole --help`
+
+```
+Usage: rakali-undistort-pinhole [OPTIONS]
+
+  Undistort live feed from pinhole model type camera
+
+Options:
+  --version                Show the version and exit.
+  -s, --source TEXT        Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
+                           http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1]
+  --calibration-file TEXT  Camera calibration data  [default: pinhole_calibration.npz]
+  --help                   Show this message and exit.
+```
+
 ## rakali-undistort-fisheye
+
 
 
 ## rakali-view-stereo=rakali
