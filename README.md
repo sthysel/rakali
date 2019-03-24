@@ -184,13 +184,93 @@ Options:
 
 ## rakali-undistort-fisheye
 
+Correct video feed from calibrated fisheye-lens camera 
 
+`$ rakali-undistort-fisheye --help`
 
-## rakali-view-stereo=rakali
+```
+Usage: rakali-undistort-fisheye [OPTIONS]
+
+  Undistort live video feed from fish-eye lens camera
+
+Options:
+  --version                Show the version and exit.
+  -s, --source TEXT        Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
+                           http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1]
+  --calibration-file PATH  Camera calibration data  [default: fisheye_calibration.npz]
+  -b, --balance FLOAT      Balance value 0.0 ~30% pixel loss, 1.0 no loss  [default: 1.0]
+  --help                   Show this message and exit.
+  
+```
+
+## rakali-view-stereo
+
+View live feed from stereo camera rig
+
+`$ rakali-view-stereo --help `
+
+```
+Usage: rakali-view-stereo [OPTIONS]
+
+Options:
+  --version             Show the version and exit.
+  -l, --left-eye TEXT   Left eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default: http://axis-
+                        lab/axis-cgi/mjpg/video.cgi?&camera=1]
+  -r, --right-eye TEXT  Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default: http://axis-
+                        lab/axis-cgi/mjpg/video.cgi?&camera=2]
+  --help                Show this message and exit.
+  
+```
+
 
 ## rakali-split-stereo-feed
 
+Split source stereo recording into left and right camera views
+  
+`$ rakali-split-stereo-feed --help`
+
+```
+Usage: rakali-split-stereo-feed [OPTIONS]
+
+  Split source stereo recording into left and right camera views
+
+Options:
+  --version              Show the version and exit.
+  -s, --source TEXT      Stereo video source file to split  [default: in.avi]
+  -l, --left-name TEXT   Left camera video name  [default: left_eye_out.avi]
+  -r, --right-name TEXT  Right camera video name  [default: right_eye_out.avi]
+  --fps FLOAT            Frames per second rate for output file  [default: 12.5]
+  --help                 Show this message and exit.
+```
+
+
 ## rakali
+
+Rakali ships with a small demo app that exercises the library image processing
+functionality.
+
+```zsh
+$ rakali --help
+Usage: rakali [OPTIONS] COMMAND [ARGS]...
+
+  Rakali image tools
+
+  Provide either a input file or a input URL for image source
+
+Options:
+  --version               Show the version and exit.
+  -i, --input-file PATH   Use file
+  -u, --input-url TEXT    Fetch image from URL
+  -o, --output-file PATH  Output file  [default: out.jpg]
+  --help                  Show this message and exit.
+
+Commands:
+  resize          Resize the input image preserving aspect ratio, favoring width
+  rotate          Rotate the input image
+  rotate-bounded  Rotate the input image, keeping bound in place
+  skeletonize     Skeletonize the input image
+
+```
 
 # Library usage
 
@@ -262,32 +342,6 @@ with stream, player, writer:
 ![canny](docs/pics/canny.jpg)
 
 
-# cli usage
-
-Rakali ships with a small demo app that exercises the library functionality.
-
-```zsh
-$ rakali --help
-Usage: rakali [OPTIONS] COMMAND [ARGS]...
-
-  Rakali image tools
-
-  Provide either a input file or a input URL for image source
-
-Options:
-  --version               Show the version and exit.
-  -i, --input-file PATH   Use file
-  -u, --input-url TEXT    Fetch image from URL
-  -o, --output-file PATH  Output file  [default: out.jpg]
-  --help                  Show this message and exit.
-
-Commands:
-  resize          Resize the input image preserving aspect ratio, favoring width
-  rotate          Rotate the input image
-  rotate-bounded  Rotate the input image, keeping bound in place
-  skeletonize     Skeletonize the input image
-
-```
 
 # Install
 
