@@ -109,6 +109,7 @@ def get_points_from_chessboard_images(
     boards_path,
     chessboard_size,
     square_size,
+    side='',
 ):
     """
     Process folder with chesboard images and gather image points
@@ -125,7 +126,7 @@ def get_points_from_chessboard_images(
         return image_size
 
     image_size = None
-    images = glob.glob(str(boards_path / '*.jpg'))
+    images = glob.glob(str(boards_path / f'{side}*.jpg'))
     zero = get_zero_object(
         square_size=square_size,
         pattern_size=chessboard_size,
@@ -141,7 +142,7 @@ def get_points_from_chessboard_images(
             image_points.append(corners)
             object_points.append(zero)
         else:
-            print(f'Ignoring {fname}')
+            print(f'No good chessboard corners in {fname}, ignoring')
 
     h, w = image_size
     return object_points, image_points, (w, h)
