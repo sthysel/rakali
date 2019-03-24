@@ -5,9 +5,18 @@ Discover IP cameras on local LAN
 import nmap
 import click
 from ipaddress import ip_interface
+from pprint import pprint
 
 import socket
 from ..discover import discover
+
+
+class OptionConfig(object):
+    def __init__(self):
+        pass
+
+
+option_config = click.make_pass_decorator(OptionConfig, ensure=True)
 
 
 def my_ip():
@@ -28,9 +37,9 @@ def get_local_net():
 
 @click.group(context_settings=dict(max_content_width=120))
 @click.version_option()
-def cli():
-    """ """
-    pass
+@option_config
+def cli(config):
+    """ Discover IP cameras on local LAN """
 
 
 @cli.command('service')
@@ -41,7 +50,8 @@ def cli():
     default='axis',
     show_default=True,
 )
-def service():
+@option_config
+def service(config, service):
     """
     Scanning for video feed services
     """
@@ -79,4 +89,4 @@ def cams(vendor_name, local_lan):
         for hostname in host['hostnames']:
             if hostname['name'].find(vendor_name) >= 0:
                 found.append(_name)
-    print(found)
+    pprint(found)

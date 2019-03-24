@@ -23,6 +23,3 @@ def discover(service: str = '_axis-video._tcp.local.'):
         input('Press enter to exit...')
     finally:
         zeroconf.close()
-
-
-discover()

@@ -38,6 +38,8 @@ setup(
         'imutils',
         'py-cpuinfo',
         'GPUtil',
+        'nmap',
+        'zeroconf',
     ],
     author='sthysel',
     author_email='sthysel@gmail.com',

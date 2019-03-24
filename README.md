@@ -1,7 +1,12 @@
 # Rakali (Version 0.0.7)
 
-Rakali is a imaging library and tool-set. It makes use of many other imaging libraries and frameworks and is
-also intended to be used as a pedagogical resource for those.
+Rakali is a imaging library and video camera tool-set. It provides a number of
+camera primitives to help with calibrating mono and stereo camera rigs, image
+processing and object detection. It also includes a number of pre-built tools to
+help with that.
+
+Rakali makes use of many other imaging libraries and frameworks and is also intended
+to be used as a pedagogical resource for those.
 
 ![Rakali by Pia Ravenari](https://raw.githubusercontent.com/sthysel/rakali/master/docs/pics/rakali.jpg)
 
@@ -9,6 +14,76 @@ also intended to be used as a pedagogical resource for those.
 
 Named after Hydromys chrysogaster, the Australian Otter
 
+# Provided tools
+
+Rakali ships with a number of tools that assists working with mono and stereo
+video cameras.
+
+
+## rakali-find-ipcameras
+
+Scan local LAN for IP cameras by vendor and service.
+
+```
+$  rakali-find-ipcameras cams
+
+Usage: rakali-find-ipcameras [OPTIONS] COMMAND [ARGS]...
+
+  Discover IP cameras on local LAN
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  cams     Discover local IP cameras using vendor name
+  service  Scanning for video feed services
+```
+
+```
+$ rakali-find-ipcameras cams 
+
+Scanning 10.41.212.0/24 for axis cameras or NVRs
+['10.41.212.135', '10.41.212.147']
+```
+
+
+## rakali-view
+
+View feed from IP and USB cameras
+
+```
+$ rakali-view --help
+Usage: rakali-view [OPTIONS]
+
+Options:
+  --version          Show the version and exit.
+  -s, --source TEXT  Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default: http://axis-
+                     lab/axis-cgi/mjpg/video.cgi?&camera=2]
+  --help             Show this message and exit.
+
+```
+
+## rakali-find-chessboards
+
+## rakali-find-chessboards-stereo
+
+
+
+## rakali-calibrate-pinhole
+
+## rakali-calibrate-fisheye
+
+## rakali-undistort-pinhole
+
+## rakali-undistort-fisheye
+
+
+## rakali-view-stereo=rakali
+
+## rakali-split-stereo-feed
+
+## rakali
 
 # Library usage
 
