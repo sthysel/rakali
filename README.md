@@ -53,6 +53,8 @@ Scanning 10.41.212.0/24 for axis cameras or NVRs
 
 View feed from IP and USB cameras
 
+![View](docs/pics/rakali-view.jpg)
+
 
 `$ rakali-view --help`
 
