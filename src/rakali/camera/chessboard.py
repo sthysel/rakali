@@ -5,10 +5,12 @@ Assists with finding chessboards in a image stream
 import glob
 import os
 import sys
+import json
 from typing import Tuple
 
 import cv2 as cv
 import numpy as np
+from .save import NumpyEncoder
 
 from ..video import cost
 
@@ -73,14 +75,15 @@ class ChessboardFinder:
 def load_image_points_file(save_file) -> Tuple[list, list, tuple]:
     """load from previously computed file """
 
+    print(f'Loading previously computed image points from {save_file}')
     try:
-        cache = np.load(save_file)
-        print(f'Loading previously computed image points from {save_file}')
-        return (
-            list(cache['object_points']),
-            list(cache['image_points']),
-            tuple(cache['image_size']),
-        )
+        with open(save_file, 'r') as f:
+            data = json.load(f)
+            return (
+                np.asarray(data['object_points']),
+                np.asarray(data['image_points']),
+                tuple(data['image_size']),
+            )
     except IOError:
         print(f'{save_file} not found')
         return None
@@ -93,13 +96,15 @@ def save_image_points_file(
     image_size,
     chessboard_size,
 ):
-    np.savez_compressed(
-        save_file,
+    data = dict(
         object_points=object_points,
         image_points=image_points,
         image_size=image_size,
         chessboard_size=chessboard_size,
     )
+    dumped = json.dumps(data, cls=NumpyEncoder, indent=4, sort_keys=True)
+    with open(save_file, 'w') as f:
+        f.write(dumped)
 
 
 def get_zero_object(pattern_size=(9, 6), square_size=0.023):

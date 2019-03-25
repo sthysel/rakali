@@ -139,7 +139,7 @@ def save_stereo_calibration_nz(
     )
 
 
-def save_stereo_calibration_json(
+def save_stereo_calibration(
     calibration_file,
     calibration_parameters: dict,
     image_size,
@@ -152,6 +152,24 @@ def save_stereo_calibration_json(
     dumped = json.dumps(calibration_parameters, cls=NumpyEncoder, indent=4, sort_keys=True)
     with open(calibration_file, 'w') as f:
         f.write(dumped)
+
+
+def load_stereo_calibration(save_file) -> dict:
+    """load from previously computed file """
+
+    print(f'Loading previously computed stereo calibration from {save_file}')
+    try:
+        with open(save_file, 'r') as f:
+            data = json.load(f)
+            # TODO
+            return (
+                np.asarray(data['object_points']),
+                np.asarray(data['image_points']),
+                tuple(data['image_size']),
+            )
+    except IOError:
+        print(f'{save_file} not found')
+        return None
 
 
 def calibrate(object_points, image_points, image_size):

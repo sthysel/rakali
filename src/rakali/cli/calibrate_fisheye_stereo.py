@@ -27,19 +27,19 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--left-image-points-file',
     help='Left Corner points data',
-    default='left_image_points.npz',
+    default='left_image_points.json',
     show_default=True,
 )
 @click.option(
     '--right-image-points-file',
     help='Right Corner points data',
-    default='right_image_points.npz',
+    default='right_image_points.json',
     show_default=True,
 )
 @click.option(
     '--calibration-file',
     help='Stereo Camera calibration data',
-    default='fisheye_stereo_calibration.npz',
+    default='fisheye_stereo_calibration.json',
     show_default=True,
 )
 @click.option(

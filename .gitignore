@@ -1,4 +1,5 @@
 *.npz
+*.json
 *.avi
 VirtualEnv
 .#*
