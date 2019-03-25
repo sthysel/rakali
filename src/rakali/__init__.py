@@ -2,7 +2,7 @@
 Rakali image processing
 """
 
-version = '0.0.7'
+version = '0.0.8'
 
 from .video.reader import VideoStream
 from .video.writer import VideoWriter
