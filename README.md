@@ -267,6 +267,7 @@ Options:
   
 ```
 
+![Stereo View](docs/pics/stereo-view.jpg)
 
 ## rakali-split-stereo-feed
 
