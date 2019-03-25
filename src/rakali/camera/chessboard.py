@@ -91,12 +91,14 @@ def save_image_points_file(
     object_points,
     image_points,
     image_size,
+    chessboard_size,
 ):
     np.savez_compressed(
         save_file,
         object_points=object_points,
         image_points=image_points,
         image_size=image_size,
+        chessboard_size=chessboard_size,
     )
 
 

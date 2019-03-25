@@ -118,7 +118,7 @@ def cli(
             chessboard_size=chessboard_size,
         )
 
-    stereo_calibration = dict()
+    stereo_calibration = dict(chessboard_size=chessboard_size)
     for side, image_points_file in zip(('left', 'right'), (left_image_points_file, right_image_points_file)):
         # use previously computed image points if they are available
         exiting_points = chessboard.load_image_points_file(image_points_file)
@@ -136,6 +136,7 @@ def cli(
                 object_points=object_points,
                 image_points=image_points,
                 image_size=image_size,
+                chessboard_size=chessboard_size,
             )
 
         # reduce points list else calibration takes too long
@@ -157,23 +158,25 @@ def cli(
             image_size=image_size,
         )
 
-    fisheye.stereo_calibrate(stereo_calibration)
+    stereo_calibration_parameters = fisheye.stereo_calibrate(stereo_calibration)
+
+    print(f'DIM={image_size}')
+    for side in ('left', 'right'):
+        cal = stereo_calibration[side]
+        K = cal['K']
+        D = cal['D']
+        rms = cal['rms']
+
+        print(f'{side} calibration')
+        print(f'K=np.array({str(K.tolist())})')
+        print(f'D=np.array({str(D.tolist())})')
+        print(f'Calibration error: {rms}')
 
     fisheye.save_stereo_calibration(
         calibration_file,
-        calibration_data=stereo_calibration,
+        calibration_parameters=stereo_calibration_parameters,
         image_size=image_size,
         salt=salt,
         pick_size=pick_size,
         cid=cid,
     )
-
-    print(f'DIM={image_size}')
-    for side, cal in stereo_calibration.items():
-        print(f'{side} calibration')
-        K = cal['K']
-        D = cal['D']
-        rms = cal['rms']
-        print(f'K=np.array({str(K.tolist())})')
-        print(f'D=np.array({str(D.tolist())})')
-        click.secho(message=f'Calibration error: {rms}')

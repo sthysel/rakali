@@ -2,6 +2,7 @@
 Fisheye camera support
 """
 
+import json
 import logging
 import time
 from datetime import datetime
@@ -13,80 +14,111 @@ import numpy as np
 
 from rakali.video.fps import cost
 
+from .save import NumpyEncoder
+
 logger = logging.getLogger(__name__)
 
 CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
 
 
-def stereo_calibrate(calibration_data):
-    """ do stereo calibration on pre-calibrated cameras"""
+def stereo_calibrate(calibration_data, use_pre_calibrated=True):
+    """
+    do stereo calibration using pre-calibration values from left and right eyes
+    """
 
-    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+    print('Calibrate Fisheye Stereo camera using pre-calibrated values')
+
     calib_flags = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
 
-    # use left as std FIXME
-    image_size = calibration_data['left']['image_size']
-    object_points = calibration_data['left']['object_points']
+    chessboard_size = calibration_data['chessboard_size']
+    board_area = chessboard_size[0] * chessboard_size[1]
+    img_size = calibration_data['left']['image_size']
 
-    left_K = calibration_data['left']['K']
-    left_D = calibration_data['left']['D']
-    left_image_points = calibration_data['left']['image_points']
-
-    right_K = calibration_data['right']['K']
-    right_D = calibration_data['right']['D']
-    right_image_points = calibration_data['right']['image_points']
+    if use_pre_calibrated:
+        K_left = calibration_data['left']['K']
+        D_left = calibration_data['left']['D']
+        K_right = calibration_data['right']['K']
+        D_right = calibration_data['right']['D']
+    else:
+        K_left = np.zeros((3, 3))
+        D_left = np.zeros((4, 1))
+        K_right = np.zeros((3, 3))
+        D_right = np.zeros((4, 1))
 
     R = np.zeros((1, 1, 3), dtype=np.float64)
     T = np.zeros((1, 1, 3), dtype=np.float64)
 
-    # bmf
-    N_OK = len(left_image_points)
-    object_points = np.reshape(object_points, (N_OK, 1, 6 * 9, 3))
-    left_image_points = np.reshape(left_image_points, (N_OK, 1, 6 * 9, 2))
-    right_image_points = np.reshape(right_image_points, (N_OK, 1, 6 * 9, 2))
+    imgpoints_left = calibration_data['left']['image_points']
+    imgpoints_right = calibration_data['left']['image_points']
+
+    N_OK = len(imgpoints_left)
+
+    objp = np.zeros((board_area, 1, 3), np.float64)
+    objp[:, 0, :2] = np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]].T.reshape(-1, 2)
+
+    objpoints = np.array([objp] * len(imgpoints_left), dtype=np.float64)
+    imgpoints_left = np.asarray(imgpoints_left, dtype=np.float64)
+    imgpoints_right = np.asarray(imgpoints_right, dtype=np.float64)
+
+    objpoints = np.reshape(objpoints, (N_OK, 1, board_area, 3))
+    imgpoints_left = np.reshape(imgpoints_left, (N_OK, 1, board_area, 2))
+    imgpoints_right = np.reshape(imgpoints_right, (N_OK, 1, board_area, 2))
 
     rms, K_left, D_left, K_right, D_right, R, T = cv.fisheye.stereoCalibrate(
-        objectPoints=object_points,
-        imagePoints1=left_image_points,
-        imagePoints2=right_image_points,
-        K1=left_K,
-        D1=left_D,
-        K2=right_K,
-        D2=right_D,
-        imageSize=image_size,
+        objectPoints=objpoints,
+        imagePoints1=imgpoints_left,
+        imagePoints2=imgpoints_right,
+        K1=K_left,
+        D1=D_left,
+        K2=K_right,
+        D2=D_right,
+        imageSize=img_size,
         R=R,
         T=T,
-        # flags=calib_flags,
-        # criteria=criteria,
+        flags=calib_flags,
+        criteria=criteria,
     )
-    print(rms)
+
+    # return the combined calibration as well as the separately calibrated
+    # metrics
+    return dict(
+        rms=rms,
+        individual_calibration=calibration_data,
+        K_left=K_left,
+        D_left=D_left,
+        K_right=K_right,
+        D_right=D_right,
+        R=R,
+        T=T,
+    )
 
 
-def save_stereo_calibration(
+def save_stereo_calibration_nz(
     calibration_file,
-    calibration_data,
+    calibration_parameters: dict,
     image_size,
-    salt,
-    pick_size,
-    cid,
+    salt: int,
+    pick_size: int,
+    cid: str,
 ):
     """" Save calibration data """
     logger.info(f'Saving fisheye calibration data to {calibration_file}')
 
-    left_object_points = calibration_data['left']['object_points']
-    right_object_points = calibration_data['right']['object_points']
+    left_object_points = calibration_parameters['left']['object_points']
+    right_object_points = calibration_parameters['right']['object_points']
 
     assert (len(left_object_points) == len(right_object_points))
 
-    left_K = calibration_data['left']['K'],
-    left_D = calibration_data['left']['D'],
-    left_rms = calibration_data['left']['rms'],
-    left_image_points = calibration_data['left']['image_points'],
+    left_K = calibration_parameters['left']['K'],
+    left_D = calibration_parameters['left']['D'],
+    left_rms = calibration_parameters['left']['rms'],
+    left_image_points = calibration_parameters['left']['image_points'],
 
-    right_K = calibration_data['right']['K'],
-    right_D = calibration_data['right']['D'],
-    right_rms = calibration_data['right']['rms'],
-    right_image_points = calibration_data['right']['image_points'],
+    right_K = calibration_parameters['right']['K'],
+    right_D = calibration_parameters['right']['D'],
+    right_rms = calibration_parameters['right']['rms'],
+    right_image_points = calibration_parameters['right']['image_points'],
 
     np.savez_compressed(
         file=calibration_file,
@@ -105,6 +137,21 @@ def save_stereo_calibration(
         cid=cid,
         time=time.time(),
     )
+
+
+def save_stereo_calibration_json(
+    calibration_file,
+    calibration_parameters: dict,
+    image_size,
+    salt: int,
+    pick_size: int,
+    cid: str,
+):
+    """" Save calibration data """
+
+    dumped = json.dumps(calibration_parameters, cls=NumpyEncoder, indent=4, sort_keys=True)
+    with open(calibration_file, 'w') as f:
+        f.write(dumped)
 
 
 def calibrate(object_points, image_points, image_size):
