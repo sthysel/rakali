@@ -53,9 +53,6 @@ Scanning 10.41.212.0/24 for axis cameras or NVRs
 
 View feed from IP and USB cameras
 
-![View](docs/pics/rakali-view.jpg)
-
-
 `$ rakali-view --help`
 
 ```
@@ -69,7 +66,11 @@ Options:
 
 ```
 
+![View](docs/pics/rakali-view.jpg)
+
 ## rakali-find-chessboards
+
+![View](docs/pics/chessboard.jpg)
 
 Find checkerboard images in video feed for calibration purposes
 
@@ -92,6 +93,7 @@ Options:
 
 ## rakali-find-chessboards-stereo
 
+
 Find checkerboard images in stereo video feed for calibration purposes
 
 `rakali-find-chessboards-stereo --help`
@@ -113,6 +115,7 @@ Options:
   --help                        Show this message and exit.
 ```
   
+![View](docs/pics/stereo-chessboard.jpg)
   
 ## rakali-calibrate-pinhole
 
@@ -165,6 +168,18 @@ Options:
   
 ```
 
+`$ rakali-calibrate-fisheye`
+
+```
+Loading previously computed image points from image_points.npz
+Calibrating on 50 objects...
+INFO:rakali.camera.fisheye:Saving fisheye calibration data to fisheye_calibration.npz
+DIM=(1920, 1080)
+K=np.array([[558.6421513930135, 0.0, 977.0871045041308], [0.0, 559.5579191046008, 493.7827965652395], [0.0, 0.0, 1.0]])
+D=np.array([[-0.018316232894576033], [0.002931049514785237], [-0.0022823146847841804], [0.00014813140230995043]])
+Calibration error: 0.8771782112164381
+```
+
 ## rakali-undistort-pinhole
 
 Correct video feed from calibrated standard pinhole camera 
@@ -204,6 +219,19 @@ Options:
   --help                   Show this message and exit.
   
 ```
+
+`$ rakali-undistort-fisheye`
+
+![View](docs/pics/fisheye-undistort-balance1.jpg)
+
+`$ rakali-undistort-fisheye -b 0.5`
+
+![View](docs/pics/fisheye-undistort-balance0.5.jpg)
+
+
+`$ rakali-undistort-fisheye -b 0`
+
+![View](docs/pics/fisheye-undistort-balance0.0.jpg)
 
 ## rakali-view-stereo
 
