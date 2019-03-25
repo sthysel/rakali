@@ -16,10 +16,14 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def decorate_frame(frame, source):
+def decorate_frame(frame, side, count, source):
     img = add_frame_labels(
         frame=frame,
-        labels=[f'{source}'],
+        labels=[
+            f'{side}',
+            f'{source}',
+            f'frame # {count}',
+        ],
         color=colors.get('BHP'),
     )
     return img
@@ -42,7 +46,6 @@ def decorate_frame(frame, source):
     show_default=True,
 )
 def cli(left_eye, right_eye):
-    # _decorate = partial(decorate_frame, source=source)
     stream = StereoCamera(
         left_src=left_eye,
         right_src=right_eye,
@@ -50,8 +53,18 @@ def cli(left_eye, right_eye):
     player = VideoPlayer()
 
     with player, stream:
+        count = 0
         while go():
             ok, frames = stream.read()
             if ok:
-                stack = np.hstack(frames.frames())
+                count += 1
+                annotated = []
+                for side, source, frame in zip(('left', 'right'), (left_eye, right_eye), frames.frames()):
+                    annotated.append(decorate_frame(
+                        frame=frame,
+                        side=side,
+                        count=count,
+                        source=source,
+                    ))
+                stack = np.hstack(annotated)
                 player.show(stack)
