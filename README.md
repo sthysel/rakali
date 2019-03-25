@@ -20,6 +20,21 @@ Rakali ships with a number of tools that assists working with mono and stereo
 video cameras.
 
 
+| Tool                           | Purpose                                                        |
+| ---                            | ---                                                            |
+| rakali-find-ipcameras          | Discover IP cameras on the local LAN                           |
+| rakali-view                    | View live video stream                                         |
+| rakali-view-stereo             | View live stereo video stream                                  |
+| rakali-find-chessboards        | Find calibration images in live video feed                     |
+| rakali-find-chessboards-stereo | Find calibration images in live stereo video feed              |
+| rakali-calibrate-pinhole       | Calibrate a standard lens camera                               |
+| rakali-calibrate-fisheye       | Calibrate a fish-eyed lens camera                              |
+| rakali-undistort-pinhole       | Correct standard lens camera live video feed                   |
+| rakali-undistort-fisheye       | Correct fish-eye camera live video feed                        |
+| rakali-split-stereo-feed       | Split recorded stereo view feeds into left and right eye views |
+| rakali                         | Image processing library examplar                              |
+
+
 ## rakali-find-ipcameras
 
 Scan local LAN for IP cameras by vendor and service.
