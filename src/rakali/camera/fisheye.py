@@ -18,6 +18,95 @@ logger = logging.getLogger(__name__)
 CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
 
 
+def stereo_calibrate(calibration_data):
+    """ do stereo calibration on pre-calibrated cameras"""
+
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+    calib_flags = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+
+    # use left as std FIXME
+    image_size = calibration_data['left']['image_size']
+    object_points = calibration_data['left']['object_points']
+
+    left_K = calibration_data['left']['K']
+    left_D = calibration_data['left']['D']
+    left_image_points = calibration_data['left']['image_points']
+
+    right_K = calibration_data['right']['K']
+    right_D = calibration_data['right']['D']
+    right_image_points = calibration_data['right']['image_points']
+
+    R = np.zeros((1, 1, 3), dtype=np.float64)
+    T = np.zeros((1, 1, 3), dtype=np.float64)
+
+    # bmf
+    N_OK = len(left_image_points)
+    object_points = np.reshape(object_points, (N_OK, 1, 6 * 9, 3))
+    left_image_points = np.reshape(left_image_points, (N_OK, 1, 6 * 9, 2))
+    right_image_points = np.reshape(right_image_points, (N_OK, 1, 6 * 9, 2))
+
+    rms, K_left, D_left, K_right, D_right, R, T = cv.fisheye.stereoCalibrate(
+        objectPoints=object_points,
+        imagePoints1=left_image_points,
+        imagePoints2=right_image_points,
+        K1=left_K,
+        D1=left_D,
+        K2=right_K,
+        D2=right_D,
+        imageSize=image_size,
+        R=R,
+        T=T,
+        # flags=calib_flags,
+        # criteria=criteria,
+    )
+    print(rms)
+
+
+def save_stereo_calibration(
+    calibration_file,
+    calibration_data,
+    image_size,
+    salt,
+    pick_size,
+    cid,
+):
+    """" Save calibration data """
+    logger.info(f'Saving fisheye calibration data to {calibration_file}')
+
+    left_object_points = calibration_data['left']['object_points']
+    right_object_points = calibration_data['right']['object_points']
+
+    assert (len(left_object_points) == len(right_object_points))
+
+    left_K = calibration_data['left']['K'],
+    left_D = calibration_data['left']['D'],
+    left_rms = calibration_data['left']['rms'],
+    left_image_points = calibration_data['left']['image_points'],
+
+    right_K = calibration_data['right']['K'],
+    right_D = calibration_data['right']['D'],
+    right_rms = calibration_data['right']['rms'],
+    right_image_points = calibration_data['right']['image_points'],
+
+    np.savez_compressed(
+        file=calibration_file,
+        object_points=left_object_points,  # pick left both should be the same
+        left_K=left_K,
+        left_D=left_D,
+        left_rms=left_rms,
+        left_image_points=left_image_points,
+        right_K=right_K,
+        right_D=right_D,
+        right_rms=right_rms,
+        right_image_points=right_image_points,
+        image_size=image_size,
+        salt=salt,
+        pick_size=pick_size,
+        cid=cid,
+        time=time.time(),
+    )
+
+
 def calibrate(object_points, image_points, image_size):
     """
     Calibrate the pinhole camera using image points

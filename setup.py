@@ -22,6 +22,7 @@ setup(
             'rakali-find-ipcameras=rakali.cli.find_ip_cameras:cli',
             'rakali-calibrate-pinhole=rakali.cli.calibrate_pinhole:cli',
             'rakali-calibrate-fisheye=rakali.cli.calibrate_fisheye:cli',
+            'rakali-calibrate-fisheye-stereo=rakali.cli.calibrate_fisheye_stereo:cli',
             'rakali-undistort-pinhole=rakali.cli.undistort_pinhole:cli',
             'rakali-undistort-fisheye=rakali.cli.undistort_fisheye:cli',
             'rakali-view=rakali.cli.view_feed:cli',

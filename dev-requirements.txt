@@ -4,6 +4,7 @@ pytest
 bumpversion
 
 flake8
+autoflake
 twine
 autopep8
 yapf

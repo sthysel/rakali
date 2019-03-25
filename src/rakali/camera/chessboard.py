@@ -2,11 +2,13 @@
 Assists with finding chessboards in a image stream
 """
 
-import cv2 as cv
 import glob
+import os
 import sys
-import numpy as np
 from typing import Tuple
+
+import cv2 as cv
+import numpy as np
 
 from ..video import cost
 
@@ -146,3 +148,49 @@ def get_points_from_chessboard_images(
 
     h, w = image_size
     return object_points, image_points, (w, h)
+
+
+def filter_unusable_pairs(
+    boards_path,
+    chessboard_size,
+):
+    """ Run through image set and remove all pairs that fail the quality test"""
+
+    def remove_pair(filename):
+        """remove complementary pair if one of the pair is unfit """
+        print(f'Removing complementary pair of which {filename} is part')
+        _, rest = filename.split('_')
+        pair = glob.glob(str(boards_path / f'*_{rest}'))
+        for _file in pair:
+            try:
+                os.remove(_file)
+            except OSError:
+                print(f'Error deleting {_file}')
+        return pair
+
+    def check_size(image, image_size):
+        if image_size is None:
+            return img.shape[:2]
+        else:
+            if img.shape[:2] != image_size:
+                print(f'Image {fname} size incorrect')
+                remove_pair(fname)
+        return image_size
+
+    image_size = None
+    images = glob.glob(str(boards_path / f'*.jpg'))
+    finder = ChessboardFinder(chessboard_size)
+    filtered = []
+    for fname in images:
+        # do not try and check a file that has been removed because its pair
+        # was broken
+        if fname in filtered:
+            continue
+
+        img = cv.imread(fname)
+        image_size = check_size(image=img, image_size=image_size)
+        ok, _ = finder.corners(img, fast=False)
+        if ok:
+            print(f'Image {fname} OK')
+        else:
+            filtered.extend(remove_pair(fname))
