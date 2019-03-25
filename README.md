@@ -1,4 +1,4 @@
-# Rakali (Version 0.0.8)
+# Rakali (Version 0.0.9)
 
 Rakali is a imaging library and video camera tool-set. It provides a number of
 camera primitives to help with calibrating mono and stereo camera rigs, image
