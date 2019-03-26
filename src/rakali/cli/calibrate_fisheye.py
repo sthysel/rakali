@@ -28,13 +28,13 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--image-points-file',
     help='Corner points data',
-    default='image_points.npz',
+    default='image_points.json',
     show_default=True,
 )
 @click.option(
     '--calibration-file',
     help='Camera calibration data',
-    default='fisheye_calibration.npz',
+    default='fisheye_calibration.json',
     show_default=True,
 )
 @click.option(
@@ -114,10 +114,8 @@ def cli(
             object_points=object_points,
             image_points=image_points,
             image_size=image_size,
+            chessboard_size=chessboard_size,
         )
-
-    w, h = image_size
-    assert (w > h)
 
     # reduce points list else calibration takes too long
     random.seed(salt)

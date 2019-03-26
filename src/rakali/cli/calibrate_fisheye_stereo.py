@@ -105,12 +105,17 @@ def cli(
         print(f'A set of {pick_size} is to small')
         sys.exit()
 
+    # calibration chessboard images are loaded from this folder
+    # there should be left/right image pairs
     input_folder = Path(input_folder).expanduser()
     if not input_folder.exists():
         click.secho(message=f'Folder {input_folder} does not exist', err=True)
         sys.exit()
 
     chessboard_size = (chessboard_columns, chessboard_rows)
+
+    # filter through the calibration images and delete those that cannot be used
+    # for calibration due to bad chessboard detection
     if prefilter:
         print('Pre-filtering calibration images to simplify the pipeline')
         chessboard.filter_unusable_pairs(
@@ -118,6 +123,8 @@ def cli(
             chessboard_size=chessboard_size,
         )
 
+    # calibrate each eye on it own, and then use the individual eye calibration
+    # to perform a stereo calibration
     stereo_calibration = dict(chessboard_size=chessboard_size)
     for side, image_points_file in zip(('left', 'right'), (left_image_points_file, right_image_points_file)):
         # use previously computed image points if they are available
@@ -158,6 +165,7 @@ def cli(
             image_size=image_size,
         )
 
+    # perform stereo calibration using individual calibrations
     stereo_calibration_parameters = fisheye.stereo_calibrate(stereo_calibration)
 
     print(f'DIM={image_size}')

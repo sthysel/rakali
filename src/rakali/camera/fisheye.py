@@ -210,10 +210,11 @@ def save_calibration(
     error: float,
     cid: str,
 ):
-    """Save fisheye calibation to file"""
+    """Save fisheye calibration to file"""
+
     logger.info(f'Saving fisheye calibration data to {calibration_file}')
-    np.savez_compressed(
-        calibration_file,
+
+    data = dict(
         K=K,
         D=D,
         image_size=image_size,
@@ -223,22 +224,31 @@ def save_calibration(
         cid=cid,
         time=time.time(),
     )
+    dumped = json.dumps(data, cls=NumpyEncoder, indent=4, sort_keys=True)
+    with open(calibration_file, 'w') as f:
+        f.write(dumped)
 
 
 def load_calibration(calibration_file):
     """Load fisheye calibration data from file"""
+
     logger.info(f'Loading fisheye calibration data from {calibration_file}')
-    cal = np.load(calibration_file)
-    return dict(
-        K=cal['K'],
-        D=cal['D'],
-        image_size=cal['image_size'],
-        salt=int(cal['salt']),
-        pick_size=int(cal['pick_size']),
-        error=float(cal['error']),
-        cid=str(cal['cid']),
-        time=float(cal['time']),
-    )
+    try:
+        with open(calibration_file, 'r') as f:
+            cal = json.load(f)
+            return dict(
+                K=np.asarray(cal['K']),
+                D=np.asarray(cal['D']),
+                image_size=tuple(cal['image_size']),
+                salt=cal['salt'],
+                pick_size=cal['pick_size'],
+                error=cal['error'],
+                cid=cal['cid'],
+                time=cal['time'],
+            )
+    except IOError:
+        print(f'{calibration_file} not found')
+        return None
 
 
 def get_maps(
