@@ -210,10 +210,11 @@ def save_calibration(
     error: float,
     cid: str,
 ):
-    """Save fisheye calibation to file"""
+    """Save fisheye calibration to file"""
+
     logger.info(f'Saving fisheye calibration data to {calibration_file}')
-    np.savez_compressed(
-        calibration_file,
+
+    data = dict(
         K=K,
         D=D,
         image_size=image_size,
@@ -223,22 +224,31 @@ def save_calibration(
         cid=cid,
         time=time.time(),
     )
+    dumped = json.dumps(data, cls=NumpyEncoder, indent=4, sort_keys=True)
+    with open(calibration_file, 'w') as f:
+        f.write(dumped)
 
 
 def load_calibration(calibration_file):
     """Load fisheye calibration data from file"""
+
     logger.info(f'Loading fisheye calibration data from {calibration_file}')
-    cal = np.load(calibration_file)
-    return dict(
-        K=cal['K'],
-        D=cal['D'],
-        image_size=cal['image_size'],
-        salt=int(cal['salt']),
-        pick_size=int(cal['pick_size']),
-        error=float(cal['error']),
-        cid=str(cal['cid']),
-        time=float(cal['time']),
-    )
+    try:
+        with open(calibration_file, 'r') as f:
+            cal = json.load(f)
+            return dict(
+                K=np.asarray(cal['K']),
+                D=np.asarray(cal['D']),
+                image_size=tuple(cal['image_size']),
+                salt=cal['salt'],
+                pick_size=cal['pick_size'],
+                error=cal['error'],
+                cid=cal['cid'],
+                time=cal['time'],
+            )
+    except IOError:
+        print(f'{calibration_file} not found')
+        return None
 
 
 def get_maps(
@@ -253,8 +263,8 @@ def get_maps(
     """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
-    assert dim1[0] / dim1[1] == image_size[0] / image_size[
-        1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
+    # assert dim1[0] / dim1[1] == image_size[0] / image_size[
+    #     1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
     if not dim2:
         dim2 = dim1
@@ -345,8 +355,27 @@ class CalibratedFisheyeCamera:
         """ formated calibration time """
         return datetime.fromtimestamp(self.calibration_time)
 
+    def set_balance(self, balance, frame):
+        self.balance = balance
+        self.set_map(frame)
+
+    def set_size(self, w, h, frame):
+        if self.calibration:
+            self.map1, self.map2 = get_maps(
+                img=frame,
+                image_size=(w, h),
+                K=self.calibration['K'],
+                D=self.calibration['D'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
+        else:
+            logger.error('Load calibration before setting size')
+
     def set_map(self, first_frame):
         """set the maps"""
+
         if self.calibration:
             self.map1, self.map2 = get_maps(
                 img=first_frame,

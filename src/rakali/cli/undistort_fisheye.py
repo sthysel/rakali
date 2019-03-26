@@ -2,7 +2,7 @@ import click
 import numpy as np
 
 from rakali import VideoPlayer
-from rakali.video import VideoFile, go, VideoStream
+from rakali.video import VideoStream, go
 from rakali.annotate import add_frame_labels, colors
 from rakali.camera.fisheye import CalibratedFisheyeCamera
 
@@ -21,7 +21,7 @@ import sys
 @click.option(
     '--calibration-file',
     help='Camera calibration data',
-    default='fisheye_calibration.npz',
+    default='fisheye_calibration.json',
     type=click.Path(exists=True),
     show_default=True,
 )
