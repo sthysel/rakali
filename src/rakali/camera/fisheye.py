@@ -263,8 +263,8 @@ def get_maps(
     """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
-    assert dim1[0] / dim1[1] == image_size[0] / image_size[
-        1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
+    # assert dim1[0] / dim1[1] == image_size[0] / image_size[
+    #     1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
     if not dim2:
         dim2 = dim1
@@ -355,8 +355,27 @@ class CalibratedFisheyeCamera:
         """ formated calibration time """
         return datetime.fromtimestamp(self.calibration_time)
 
+    def set_balance(self, balance, frame):
+        self.balance = balance
+        self.set_map(frame)
+
+    def set_size(self, w, h, frame):
+        if self.calibration:
+            self.map1, self.map2 = get_maps(
+                img=frame,
+                image_size=(w, h),
+                K=self.calibration['K'],
+                D=self.calibration['D'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
+        else:
+            logger.error('Load calibration before setting size')
+
     def set_map(self, first_frame):
         """set the maps"""
+
         if self.calibration:
             self.map1, self.map2 = get_maps(
                 img=first_frame,
