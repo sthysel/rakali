@@ -319,7 +319,7 @@ Options:
 
 `$ rakali-undistort-fisheye-image ~/rakali/chessboards/00000.jpg`
 
-![View](docs/pics/fisheye-undistort-image.jpg)
+![View](docs/pics/fisheye-undistort-file.jpg)
 
 
 ## rakali-view-stereo
