@@ -220,9 +220,11 @@ def get_maps(
     image_size,
     K,
     D,
+    R=None,
     balance: float = 0.5,
     dim2=None,
     dim3=None,
+    fov_scale=1,
 ):
     """calculate fish-eye reprojection maps"""
 
@@ -238,18 +240,24 @@ def get_maps(
     scaled_K = K * dim1[0] / image_size[0]
     scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
 
+    if R is None:
+        R = np.eye(3)
+
+    print(R)
+
     # use scaled_K, dim2 and balance to determine the final K used to un-distort image
     new_K = cv.fisheye.estimateNewCameraMatrixForUndistortRectify(
         K=scaled_K,
         D=D,
         image_size=dim2,
-        R=np.eye(3),
+        R=R,
         balance=balance,
+        fov_scale=fov_scale,
     )
     map1, map2 = cv.fisheye.initUndistortRectifyMap(
         K=scaled_K,
         D=D,
-        R=np.eye(3),
+        R=R,
         P=new_K,
         size=dim3,
         m1type=cv.CV_16SC2,
@@ -421,6 +429,7 @@ class CalibratedStereoFisheyeCamera:
                 image_size=self.calibration['image_size'],
                 K=self.calibration['K_left'],
                 D=self.calibration['D_left'],
+                R=self.calibration['R'],
                 balance=self.balance,
                 dim2=self.dim2,
                 dim3=self.dim3,
@@ -430,6 +439,7 @@ class CalibratedStereoFisheyeCamera:
                 image_size=self.calibration['image_size'],
                 K=self.calibration['K_right'],
                 D=self.calibration['D_right'],
+                R=self.calibration['R'],
                 balance=self.balance,
                 dim2=self.dim2,
                 dim3=self.dim3,
