@@ -161,11 +161,15 @@ def load_stereo_calibration(save_file) -> dict:
     try:
         with open(save_file, 'r') as f:
             data = json.load(f)
-            # TODO
-            return (
-                np.asarray(data['object_points']),
-                np.asarray(data['image_points']),
-                tuple(data['image_size']),
+            # TODO ignore individual calibrations for now
+            return dict(
+                K_left=np.asarray(data['K_left']),
+                K_right=np.asarray(data['K_right']),
+                D_left=np.asarray(data['D_left']),
+                D_right=np.asarray(data['D_right']),
+                R=np.asarray(data['R']),
+                T=np.asarray(data['T']),
+                image_size=tuple(data['image_size']),
             )
     except IOError:
         print(f'{save_file} not found')
@@ -389,6 +393,90 @@ class CalibratedFisheyeCamera:
             )
         else:
             logger.error('Load calibration before setting the map')
+
+    @cost
+    def correct(self, frame):
+        """undistort frame"""
+        return undistort(frame, self.map1, self.map2)
+
+
+class CalibratedStereoFisheyeCamera:
+    """ A Calibrated stereo fish-eye camera """
+
+    def __init__(
+        self,
+        calibration_file,
+        balance,
+        dim2=None,
+        dim3=None,
+        name='stereo fisheye',
+    ):
+        self.balance = balance
+        self.name = name
+        self.dim2 = dim2
+        self.dim3 = dim3
+        if Path(calibration_file).exists():
+            self.calibration = load_stereo_calibration(calibration_file=calibration_file)
+        else:
+            logger.error(f'Calibration file {calibration_file} does not exist')
+            self.calibration = None
+
+    def set_calibration(self, calibration):
+        """set calibration"""
+        self.calibration = calibration
+
+    @property
+    def cid(self):
+        """calibration id"""
+        if self.calibration:
+            return self.calibration.get('cid', 'UNSET')
+        else:
+            return 'UNSET'
+
+    @property
+    def calibration_time(self):
+        """calibration time"""
+        if self.calibration:
+            return self.calibration.get('time', -1)
+        else:
+            return -1
+
+    @property
+    def calibration_time_formatted(self):
+        """ formated calibration time """
+        return datetime.fromtimestamp(self.calibration_time)
+
+    def set_maps(self, first_frame):
+        """set the left and right maps"""
+
+        # K_left=K_left,
+        # D_left=D_left,
+        # K_right=K_right,
+        # D_right=D_right,
+        # R=R,
+        # T=T,
+
+        if self.calibration:
+            self.left_map1, self.left_map2 = get_maps(
+                img=first_frame,
+                image_size=self.calibration['image_size'],
+                K=self.calibration['K_left'],
+                D=self.calibration['D_left'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
+            self.right_map1, self.right_map2 = get_maps(
+                img=first_frame,
+                image_size=self.calibration['image_size'],
+                K=self.calibration['K_right'],
+                D=self.calibration['D_right'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
+        else:
+            logger.error('Load calibration before setting the maps')
 
     @cost
     def correct(self, frame):
