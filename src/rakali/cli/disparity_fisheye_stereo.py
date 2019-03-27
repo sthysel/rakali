@@ -1,3 +1,7 @@
+"""
+Show disparity map for rectified stereo fish eye images
+"""
+
 import click
 import cv2 as cv
 
@@ -9,7 +13,11 @@ from rakali.camera.fisheye import CalibratedFisheyeCamera
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.argument(
-    'image-path',
+    'left_image',
+    type=click.Path(exists=True),
+)
+@click.argument(
+    'right_image',
     type=click.Path(exists=True),
 )
 @click.option(
@@ -24,7 +32,7 @@ from rakali.camera.fisheye import CalibratedFisheyeCamera
     '-b',
     '--balance',
     help='Balance value 0.0 ~30% pixel loss, 1.0 no loss',
-    default=1.0,
+    default=0.0,
     show_default=True,
 )
 @click.option(
@@ -36,10 +44,10 @@ from rakali.camera.fisheye import CalibratedFisheyeCamera
 )
 def cli(image_path, calibration_file, balance, scale):
     """
-    Rectify a image taken with a fish-eye lens camera using calibration parameters
+    Load stereo fisheye images, correct them and display the disparity map
     """
-    window_name = 'Undistorted fisheye'
-    cv.namedWindow(window_name)
+    disparity_window_name = 'Disparity Map'
+    cv.namedWindow(disparity_window_name)
 
     def update():
         rectified = camera.correct(img)

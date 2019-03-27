@@ -393,3 +393,71 @@ class CalibratedFisheyeCamera:
     def correct(self, frame):
         """undistort frame"""
         return undistort(frame, self.map1, self.map2)
+
+
+class CalibratedStereoFisheyeCamera:
+    """ A Calibrated stereo fish-eye camera """
+
+    def __init__(
+        self,
+        calibration_file,
+        balance,
+        dim2=None,
+        dim3=None,
+        name='stereo fisheye',
+    ):
+        self.balance = balance
+        self.name = name
+        self.dim2 = dim2
+        self.dim3 = dim3
+        if Path(calibration_file).exists():
+            self.calibration = load_calibration(calibration_file=calibration_file)
+        else:
+            logger.error(f'Calibration file {calibration_file} does not exist')
+            self.calibration = None
+
+    def set_calibration(self, calibration):
+        """set calibration"""
+        self.calibration = calibration
+
+    @property
+    def cid(self):
+        """calibration id"""
+        if self.calibration:
+            return self.calibration.get('cid', 'UNSET')
+        else:
+            return 'UNSET'
+
+    @property
+    def calibration_time(self):
+        """calibration time"""
+        if self.calibration:
+            return self.calibration.get('time', -1)
+        else:
+            return -1
+
+    @property
+    def calibration_time_formatted(self):
+        """ formated calibration time """
+        return datetime.fromtimestamp(self.calibration_time)
+
+    def set_map(self, first_frame):
+        """set the maps"""
+
+        if self.calibration:
+            self.map1, self.map2 = get_maps(
+                img=first_frame,
+                image_size=self.calibration['image_size'],
+                K=self.calibration['K'],
+                D=self.calibration['D'],
+                balance=self.balance,
+                dim2=self.dim2,
+                dim3=self.dim3,
+            )
+        else:
+            logger.error('Load calibration before setting the map')
+
+    @cost
+    def correct(self, frame):
+        """undistort frame"""
+        return undistort(frame, self.map1, self.map2)

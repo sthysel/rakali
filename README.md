@@ -31,6 +31,7 @@ video cameras.
 | rakali-calibrate-fisheye       | Calibrate a fish-eyed lens camera                              |
 | rakali-undistort-pinhole       | Correct standard lens camera live video feed                   |
 | rakali-undistort-fisheye       | Correct fish-eye camera live video feed                        |
+| rakali-undistort-fisheye-image | Correct image provided by calibrated fish-eye camera           |
 | rakali-split-stereo-feed       | Split recorded stereo view feeds into left and right eye views |
 | rakali                         | Image processing library examplar                              |
 
@@ -55,10 +56,11 @@ Commands:
   service  Scanning for video feed services
 ```
 
-`$ rakali-find-ipcameras cams `
+To scan for cameras, do: `$ rakali-find-ipcameras cams`, the default is to search for axis models.
+
+Which provides a list of discovered NVR's or cameras like so:
 
 ```
-
 Scanning 10.41.212.0/24 for axis cameras or NVRs
 ['10.41.212.135', '10.41.212.147']
 ```
@@ -78,7 +80,6 @@ Options:
   -s, --source TEXT  Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default: http://axis-
                      lab/axis-cgi/mjpg/video.cgi?&camera=2]
   --help             Show this message and exit.
-
 ```
 
 ![View](docs/pics/rakali-view.jpg)
@@ -159,7 +160,8 @@ Options:
 
 ## rakali-calibrate-fisheye
 
-Calibrate a video camera with a fish-eye lens
+Calibrate a video camera with a fish-eye lens using chessboard calibration
+images captured using `rakali-find-chessboards`.
 
 `$ rakali-calibrate-fisheye --help`
 
@@ -183,9 +185,11 @@ Options:
   
 ```
 
-`$ rakali-calibrate-fisheye`
+
+Executing `$ rakali-calibrate-fisheye` results:
 
 ```
+$ rakali-calibrate-fisheye
 Loading previously computed image points from image_points.npz
 Calibrating on 50 objects...
 INFO:rakali.camera.fisheye:Saving fisheye calibration data to fisheye_calibration.npz
@@ -193,6 +197,53 @@ DIM=(1920, 1080)
 K=np.array([[558.6421513930135, 0.0, 977.0871045041308], [0.0, 559.5579191046008, 493.7827965652395], [0.0, 0.0, 1.0]])
 D=np.array([[-0.018316232894576033], [0.002931049514785237], [-0.0022823146847841804], [0.00014813140230995043]])
 Calibration error: 0.8771782112164381
+```
+
+The resulting calibration file contains the K and D matrixes and some metadata
+
+```json
+{
+    "D": [
+        [
+            -0.018316232894576033
+        ],
+        [
+            0.002931049514785237
+        ],
+        [
+            -0.0022823146847841804
+        ],
+        [
+            0.00014813140230995043
+        ]
+    ],
+    "K": [
+        [
+            558.6421513930135,
+            0.0,
+            977.0871045041308
+        ],
+        [
+            0.0,
+            559.5579191046008,
+            493.7827965652395
+        ],
+        [
+            0.0,
+            0.0,
+            1.0
+        ]
+    ],
+    "cid": "fisheye",
+    "error": 0.8771782112164381,
+    "image_size": [
+        1920,
+        1080
+    ],
+    "pick_size": 50,
+    "salt": 888,
+    "time": 1553647761.7596939
+}
 ```
 
 ## rakali-undistort-pinhole
@@ -247,6 +298,29 @@ Options:
 `$ rakali-undistort-fisheye -b 0`
 
 ![View](docs/pics/fisheye-undistort-balance0.0.jpg)
+
+
+## rakali-undistort-fisheye-image 
+
+`$ rakali-undistort-fisheye-image --help`
+
+``` zsh
+Usage: rakali-undistort-fisheye-image [OPTIONS] IMAGE_PATH
+
+  Rectify a image taken with a fish-eye lens camera using calibration parameters
+
+Options:
+  --version                Show the version and exit.
+  --calibration-file PATH  Camera calibration data  [default: fisheye_calibration.json; required]
+  -b, --balance FLOAT      Balance value 0.0 ~30% pixel loss, 1.0 no loss  [default: 1.0]
+  -s, --scale FLOAT        Scale image  [default: 0.5]
+  --help                   Show this message and exit.
+```
+
+`$ rakali-undistort-fisheye-image ~/rakali/chessboards/00000.jpg`
+
+![View](docs/pics/fisheye-undistort-image.jpg)
+
 
 ## rakali-view-stereo
 
