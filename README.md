@@ -68,7 +68,9 @@ Scanning 10.41.212.0/24 for axis cameras or NVRs
 
 ## rakali-view
 
-View feed from IP and USB cameras
+View live video feed from IP and USB cameras. IP cameras and NVR's that
+broadcast their services over mDNS can be discovered using
+`rakali-find-ipcameras`.
 
 `$ rakali-view --help`
 
@@ -82,13 +84,19 @@ Options:
   --help             Show this message and exit.
 ```
 
+A simple single stream video player.
+
 ![View](docs/pics/rakali-view.jpg)
 
 ## rakali-find-chessboards
 
 ![View](docs/pics/chessboard.jpg)
 
-Find checkerboard images in video feed for calibration purposes
+Find checkerboard images in video feed for calibration purposes.
+
+`rakali-find-chessboards` will look for a chessboard patterns in the frame flow
+and save each frame containing a chessboard for batch processing during camera
+calibration.
 
 `$ rakali-find-chessboards --help`
 
@@ -107,10 +115,24 @@ Options:
   --help                        Show this message and exit.
 ```
 
+The process will drop calibration frames in the target folder like these:
+
+```
+$ tree ~/rakali/chessboards
+/home/thys/rakali/chessboards
+├── 00000.jpg
+├── 00001.jpg
+├── 00002.jpg
+├── 00003.jpg
+```
+
+
 ## rakali-find-chessboards-stereo
 
 
-Find checkerboard images in stereo video feed for calibration purposes
+Find checkerboard images in stereo video feed for calibration purposes. It
+operates in the same way as `rakali-find-chessboards` but produces pairs of
+frames.
 
 `rakali-find-chessboards-stereo --help`
 
@@ -132,6 +154,20 @@ Options:
 ```
   
 ![View](docs/pics/stereo-chessboard.jpg)
+
+
+``` zsh
+$ tree ~/rakali/stereo/chessboards
+/home/thys/rakali/stereo/chessboards
+├── left_00000.jpg
+├── left_00001.jpg
+├── left_00002.jpg
+├── right_00000.jpg
+├── right_00001.jpg
+├── right_00002.jpg
+
+```
+
   
 ## rakali-calibrate-pinhole
 
