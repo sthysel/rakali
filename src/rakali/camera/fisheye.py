@@ -94,51 +94,6 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     )
 
 
-def save_stereo_calibration_nz(
-    calibration_file,
-    calibration_parameters: dict,
-    image_size,
-    salt: int,
-    pick_size: int,
-    cid: str,
-):
-    """" Save calibration data """
-    logger.info(f'Saving fisheye calibration data to {calibration_file}')
-
-    left_object_points = calibration_parameters['left']['object_points']
-    right_object_points = calibration_parameters['right']['object_points']
-
-    assert (len(left_object_points) == len(right_object_points))
-
-    left_K = calibration_parameters['left']['K'],
-    left_D = calibration_parameters['left']['D'],
-    left_rms = calibration_parameters['left']['rms'],
-    left_image_points = calibration_parameters['left']['image_points'],
-
-    right_K = calibration_parameters['right']['K'],
-    right_D = calibration_parameters['right']['D'],
-    right_rms = calibration_parameters['right']['rms'],
-    right_image_points = calibration_parameters['right']['image_points'],
-
-    np.savez_compressed(
-        file=calibration_file,
-        object_points=left_object_points,  # pick left both should be the same
-        left_K=left_K,
-        left_D=left_D,
-        left_rms=left_rms,
-        left_image_points=left_image_points,
-        right_K=right_K,
-        right_D=right_D,
-        right_rms=right_rms,
-        right_image_points=right_image_points,
-        image_size=image_size,
-        salt=salt,
-        pick_size=pick_size,
-        cid=cid,
-        time=time.time(),
-    )
-
-
 def save_stereo_calibration(
     calibration_file,
     calibration_parameters: dict,
@@ -149,17 +104,22 @@ def save_stereo_calibration(
 ):
     """" Save calibration data """
 
+    calibration_parameters['image_size'] = image_size
+    calibration_parameters['salt'] = salt
+    calibration_parameters['pick_size'] = pick_size
+    calibration_parameters['cid'] = cid
+
     dumped = json.dumps(calibration_parameters, cls=NumpyEncoder, indent=4, sort_keys=True)
     with open(calibration_file, 'w') as f:
         f.write(dumped)
 
 
-def load_stereo_calibration(save_file) -> dict:
+def load_stereo_calibration(calibration_file) -> dict:
     """load from previously computed file """
 
-    print(f'Loading previously computed stereo calibration from {save_file}')
+    print(f'Loading previously computed stereo calibration from {calibration_file}')
     try:
-        with open(save_file, 'r') as f:
+        with open(calibration_file, 'r') as f:
             data = json.load(f)
             # TODO ignore individual calibrations for now
             return dict(
@@ -172,7 +132,7 @@ def load_stereo_calibration(save_file) -> dict:
                 image_size=tuple(data['image_size']),
             )
     except IOError:
-        print(f'{save_file} not found')
+        print(f'{calibration_file} not found')
         return None
 
 
@@ -267,9 +227,8 @@ def get_maps(
     """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
-    print(dim1)
-    # assert dim1[0] / dim1[1] == image_size[0] / image_size[
-    #     1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
+    assert dim1[0] / dim1[1] == image_size[0] / image_size[
+        1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
     if not dim2:
         dim2 = dim1
@@ -479,6 +438,10 @@ class CalibratedStereoFisheyeCamera:
             logger.error('Load calibration before setting the maps')
 
     @cost
-    def correct(self, frame):
-        """undistort frame"""
-        return undistort(frame, self.map1, self.map2)
+    def correct(self, left, right):
+        """undistort frames"""
+
+        left_corrected = undistort(left, self.left_map1, self.left_map2)
+        right_corrected = undistort(right, self.right_map1, self.right_map2)
+
+        return (left_corrected, right_corrected)

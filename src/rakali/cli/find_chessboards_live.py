@@ -69,7 +69,7 @@ def find_chessboards_in_stream(source, chessboard_size, out_folder):
 @click.option(
     '-o',
     '--output-folder',
-    help='Fetch image from URL',
+    help='Chessboard images store folder',
     default='~/rakali/chessboards/',
     show_default=True,
 )

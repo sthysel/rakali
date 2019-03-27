@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     '-o',
     '--output-folder',
-    help='Fetch image from URL',
+    help='Chessboard images store folder',
     default='~/rakali/stereo/chessboards/',
     show_default=True,
 )

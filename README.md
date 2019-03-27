@@ -20,20 +20,21 @@ Rakali ships with a number of tools that assists working with mono and stereo
 video cameras.
 
 
-| Tool                           | Purpose                                                        |
-| ---                            | ---                                                            |
-| rakali-find-ipcameras          | Discover IP cameras on the local LAN                           |
-| rakali-view                    | View live video stream                                         |
-| rakali-view-stereo             | View live stereo video stream                                  |
-| rakali-find-chessboards        | Find calibration images in live video feed                     |
-| rakali-find-chessboards-stereo | Find calibration images in live stereo video feed              |
-| rakali-calibrate-pinhole       | Calibrate a standard lens camera                               |
-| rakali-calibrate-fisheye       | Calibrate a fish-eyed lens camera                              |
-| rakali-undistort-pinhole       | Correct standard lens camera live video feed                   |
-| rakali-undistort-fisheye       | Correct fish-eye camera live video feed                        |
-| rakali-undistort-fisheye-image | Correct image provided by calibrated fish-eye camera           |
-| rakali-split-stereo-feed       | Split recorded stereo view feeds into left and right eye views |
-| rakali                         | Image processing library examplar                              |
+| Tool                            | Purpose                                                        |
+| ---                             | ---                                                            |
+| rakali-find-ipcameras           | Discover IP cameras on the local LAN                           |
+| rakali-view                     | View live video stream                                         |
+| rakali-view-stereo              | View live stereo video stream                                  |
+| rakali-find-chessboards         | Find calibration images in live video feed                     |
+| rakali-find-chessboards-stereo  | Find calibration images in live stereo video feed              |
+| rakali-calibrate-pinhole        | Calibrate a standard lens camera                               |
+| rakali-calibrate-fisheye        | Calibrate a fish-eyed lens camera                              |
+| rakali-calibrate-fisheye-stereo | Calibrate a fish-eyed stereo rig                               |
+| rakali-undistort-pinhole        | Correct standard lens camera live video feed                   |
+| rakali-undistort-fisheye        | Correct fish-eye camera live video feed                        |
+| rakali-undistort-fisheye-image  | Correct image provided by calibrated fish-eye camera           |
+| rakali-split-stereo-feed        | Split recorded stereo view feeds into left and right eye views |
+| rakali                          | Image processing library examplar                              |
 
 
 ## rakali-find-ipcameras
@@ -100,7 +101,8 @@ calibration.
 
 `$ rakali-find-chessboards --help`
 
-```
+```zsh
+
 Usage: rakali-find-chessboards [OPTIONS]
 
   Test each frame in the stream for the presence of a chess-board pattern. If found, save to the output folder
@@ -109,10 +111,11 @@ Options:
   --version                     Show the version and exit.
   -s, --source TEXT             Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default:
                                 http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1]
-  -o, --output-folder TEXT      Fetch image from URL  [default: ~/rakali/chessboards/]
+  -o, --output-folder TEXT      Output folder for images containing a chessboard  [default: ~/rakali/chessboards/]
   --chessboard-rows INTEGER     Chessboard rows  [default: 9]
   --chessboard-columns INTEGER  Chessboard columns  [default: 6]
   --help                        Show this message and exit.
+  
 ```
 
 The process will drop calibration frames in the target folder like these:
@@ -281,6 +284,59 @@ The resulting calibration file contains the K and D matrixes and some metadata
     "time": 1553647761.7596939
 }
 ```
+
+## rakali-calibrate-fisheye-stereo
+
+`rakali-calibrate-fisheye-stereo` uses a fixed set of previously captured chessboard images to calibrate a
+fisheye stereo camera rig. The calculated parameters are saved in a calibration file for use in image
+rectification.
+
+`$ rakali-calibrate-fisheye-stereo --help`
+
+``` zsh
+Usage: rakali-calibrate-fisheye-stereo [OPTIONS]
+
+  Calibrate fish-eye stereo camera rig using chessboard frames captured earlier.
+
+Options:
+  --version                       Show the version and exit.
+  -i, --input-folder TEXT         Folder where chessboard images are stored  [default: ~/rakali/stereo/chessboards/]
+  --left-image-points-file TEXT   Left Corner points data  [default: left_image_points.json]
+  --right-image-points-file TEXT  Right Corner points data  [default: right_image_points.json]
+  --calibration-file TEXT         Stereo Camera calibration data  [default: fisheye_stereo_calibration.json]
+  --chessboard-rows INTEGER       Chessboard rows  [default: 9]
+  --chessboard-columns INTEGER    Chessboard columns  [default: 6]
+  --square-size FLOAT             Chessboard square size in m  [default: 0.023]
+  --salt INTEGER                  Seed value for random picking of calibration images from a large set  [default: 888]
+  --pick-size INTEGER             Size of image set to use for calibration, picked from available set  [default: 50]
+  --cid TEXT                      Calibration ID to associate a calibration file with a device  [default: fisheye]
+  --prefilter / --no-prefilter    Prefilter images  [default: True]
+  --help                          Show this message and exit.
+```
+
+```zsh
+....
+Image /home/thys/rakali/stereo/chessboards/left_00088.jpg OK
+Image /home/thys/rakali/stereo/chessboards/left_00058.jpg OK
+Image /home/thys/rakali/stereo/chessboards/right_00238.jpg OK
+Image /home/thys/rakali/stereo/chessboards/left_00122.jpg OK
+Loading previously computed image points from left_image_points.json
+Calibrating on 50 objects...
+Loading previously computed image points from right_image_points.json
+Calibrating on 50 objects...
+Calibrate Fisheye Stereo camera using pre-calibrated values
+DIM=(1920, 1080)
+left calibration
+K=np.array([[552.7233750094179, 0.0, 948.2959591699556], [0.0, 554.6925141069631, 548.3575557665413], [0.0, 0.0, 1.0]])
+D=np.array([[-0.05136306776237411], [0.0959513318929465], [-0.09081590588179426], [0.028414418435600244]])
+Calibration error: 0.5128009096414867
+right calibration
+K=np.array([[552.7233750094177, 0.0, 948.2959591699567], [0.0, 554.6925141069636, 548.3575557665405], [0.0, 0.0, 1.0]])
+D=np.array([[-0.051363067762376646], [0.09595133189294996], [-0.09081590588179408], [0.028414418435599085]])
+Calibration error: 0.46991635076102695
+
+```
+
 
 ## rakali-undistort-pinhole
 
