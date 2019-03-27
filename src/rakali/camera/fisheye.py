@@ -263,6 +263,7 @@ def get_maps(
     """calculate fish-eye reprojection maps"""
 
     dim1 = img.shape[:2][::-1]
+    print(dim1)
     # assert dim1[0] / dim1[1] == image_size[0] / image_size[
     #     1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
 
