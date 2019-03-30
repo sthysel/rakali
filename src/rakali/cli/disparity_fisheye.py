@@ -10,7 +10,7 @@ import cv2 as cv
 import numpy as np
 
 from rakali.annotate import add_frame_labels, colors
-from rakali.camera.fisheye import CalibratedStereoFisheyeCamera
+from rakali.camera.fisheye_stereo import CalibratedStereoFisheyeCamera
 from rakali import transforms
 
 

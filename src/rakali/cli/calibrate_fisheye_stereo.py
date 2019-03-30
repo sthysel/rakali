@@ -9,6 +9,7 @@ from pathlib import Path
 import logging
 
 from rakali.camera import fisheye
+from rakali.camera import fisheye_stereo
 from rakali.camera import chessboard
 
 logging.basicConfig(level=logging.DEBUG)
@@ -166,7 +167,7 @@ def cli(
         )
 
     # perform stereo calibration using individual calibrations
-    stereo_calibration_parameters = fisheye.stereo_calibrate(stereo_calibration)
+    stereo_calibration_parameters = fisheye_stereo.stereo_calibrate(stereo_calibration)
 
     print(f'DIM={image_size}')
     for side in ('left', 'right'):
@@ -180,7 +181,7 @@ def cli(
         print(f'D=np.array({str(D.tolist())})')
         print(f'Calibration error: {rms}')
 
-    fisheye.save_stereo_calibration(
+    fisheye_stereo.save_stereo_calibration(
         calibration_file,
         calibration_parameters=stereo_calibration_parameters,
         image_size=image_size,
