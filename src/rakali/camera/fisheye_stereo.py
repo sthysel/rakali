@@ -7,20 +7,15 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-import cv2 as cv
 import numpy as np
 
+import cv2 as cv
 from rakali.video.fps import cost
 
-from .fisheye import get_maps, undistort
+from .fisheye import CAL_FLAGS, STOP_CRITERIA, get_maps, undistort
 from .save import NumpyEncoder
 
 logger = logging.getLogger(__name__)
-
-STOP_CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-
-CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
-CAL_FLAGS = cv.fisheye.CALIB_FIX_INTRINSIC
 
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
@@ -72,11 +67,9 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     # objpoints shape: (<num of calibration images>, 1, <num points in set>, 3)
     # imgpoints_left shape: (<num of calibration images>, 1, <num points in set>, 2)
     # imgpoints_right shape: (<num of calibration images>, 1, <num points in set>, 2)
-    print(objpoints.shape)
-    print(imgpoints_left.shape)
-    print(imgpoints_right.shape)
-
-    print(objpoints[:2].shape)
+    # print(objpoints.shape)
+    # print(imgpoints_left.shape)
+    # print(imgpoints_right.shape)
 
     rms, new_K_left, new_D_left, new_K_right, new_D_right, R, T = cv.fisheye.stereoCalibrate(
         objectPoints=objpoints,
@@ -95,7 +88,7 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
 
     # return the combined calibration as well as the separately calibrated
     # metrics
-    return dict(
+    calibration = dict(
         rms=rms,
         individual_calibration=calibration_data,
         K_left=new_K_left,
@@ -105,6 +98,8 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
         R=R,
         T=T,
     )
+    print_calibration(calibration)
+    return calibration
 
 
 def save_stereo_calibration(
@@ -243,8 +238,7 @@ class CalibratedStereoFisheyeCamera:
                 image_size=self.calibration['image_size'],
                 K=self.calibration['K_left'],
                 D=self.calibration['D_left'],
-                #R=self.R_left,
-                R=self.calibration['R'],
+                R=self.R_left,
                 balance=self.balance,
                 dim2=self.dim2,
                 dim3=self.dim3,
@@ -254,8 +248,7 @@ class CalibratedStereoFisheyeCamera:
                 image_size=self.calibration['image_size'],
                 K=self.calibration['K_right'],
                 D=self.calibration['D_right'],
-                # R=self.R_right,
-                R=self.calibration['R'],
+                R=self.R_right,
                 balance=self.balance,
                 dim2=self.dim2,
                 dim3=self.dim3,
