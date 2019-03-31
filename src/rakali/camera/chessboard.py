@@ -135,7 +135,7 @@ def get_points_from_chessboard_images(
         return image_size
 
     image_size = None
-    images = glob.glob(str(boards_path / f'{side}*.jpg'))
+    images = sorted(glob.glob(str(boards_path / f'{side}*.jpg')))
     zero = get_zero_object(
         square_size=square_size,
         pattern_size=chessboard_size,
@@ -144,6 +144,7 @@ def get_points_from_chessboard_images(
     image_points = []
     object_points = []
     for fname in images:
+        print(f'Processing chessboards file {fname}')
         img = cv.imread(fname)
         image_size = check_size(image=img, image_size=image_size)
         ok, corners = finder.corners(img, fast=False)

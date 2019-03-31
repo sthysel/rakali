@@ -17,8 +17,10 @@ from .save import NumpyEncoder
 
 logger = logging.getLogger(__name__)
 
-CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
 STOP_CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+
+CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+CAL_FLAGS = cv.fisheye.CALIB_FIX_INTRINSIC
 
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
@@ -66,6 +68,15 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     objpoints = np.reshape(objpoints, (N_OK, 1, board_area, 3))
     imgpoints_left = np.reshape(imgpoints_left, (N_OK, 1, board_area, 2))
     imgpoints_right = np.reshape(imgpoints_right, (N_OK, 1, board_area, 2))
+
+    # objpoints shape: (<num of calibration images>, 1, <num points in set>, 3)
+    # imgpoints_left shape: (<num of calibration images>, 1, <num points in set>, 2)
+    # imgpoints_right shape: (<num of calibration images>, 1, <num points in set>, 2)
+    print(objpoints.shape)
+    print(imgpoints_left.shape)
+    print(imgpoints_right.shape)
+
+    print(objpoints[:2].shape)
 
     rms, new_K_left, new_D_left, new_K_right, new_D_right, R, T = cv.fisheye.stereoCalibrate(
         objectPoints=objpoints,
