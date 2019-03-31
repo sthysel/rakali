@@ -557,9 +557,19 @@ with stream, player, writer:
 
 # Install
 
-Rakali is essentially a OpenCV shim and installs the current (unofficial)
-opencv-python wheel from PyPi. If you have a custom OpenCV build, make sure that
-installing Rakali does not clobber that. 
+Rakali is essentially a OpenCV shim. Because some parts of Rakali depends on OpenCV CUDA being available. The
+'python-opencv' lib on PyPi is not marked as a dependency. You need to install either that yourself, or use
+your own pre-compiled OpenCV CUDA. Arch Linux has opencv-cuda in AUR, so install that:
+
+```
+$ yay -S opencv-cuda
+```
+
+While you are at it also install `tensorflow-opt-cuda`:
+
+```
+# pacman -S tensorflow-opt-cuda
+```
 
 
 ## pypi

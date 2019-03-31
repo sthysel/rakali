@@ -82,7 +82,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--prefilter/--no-prefilter',
     help='Prefilter images',
-    default=True,
+    default=False,
     show_default=True,
 )
 def cli(
@@ -102,7 +102,7 @@ def cli(
     Calibrate fish-eye stereo camera rig using chessboard frames captured earlier.
     """
 
-    if pick_size < 5:
+    if pick_size < 1:
         print(f'A set of {pick_size} is to small')
         sys.exit()
 
@@ -165,6 +165,7 @@ def cli(
             object_points=object_points,
             image_size=image_size,
         )
+        print(f'Calibrated {side} camera, error: {rms}')
 
     # perform stereo calibration using individual calibrations
     stereo_calibration_parameters = fisheye_stereo.stereo_calibrate(stereo_calibration)

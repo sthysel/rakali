@@ -37,7 +37,7 @@ setup(
         'click',
         'numpy',
         'scipy',
-        'opencv-python',
+        #'opencv-python',
         'imutils',
         'py-cpuinfo',
         'GPUtil',

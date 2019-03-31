@@ -47,7 +47,12 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     T = np.zeros((1, 1, 3), dtype=np.float64)
 
     imgpoints_left = calibration_data['left']['image_points']
-    imgpoints_right = calibration_data['left']['image_points']
+    imgpoints_right = calibration_data['right']['image_points']
+
+    # print(len(imgpoints_left), len(imgpoints_right))
+    # with np.printoptions(precision=3, suppress=True):
+    #     print(imgpoints_left)
+    #     print(imgpoints_right)
 
     N_OK = len(imgpoints_left)
 
@@ -62,7 +67,7 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     imgpoints_left = np.reshape(imgpoints_left, (N_OK, 1, board_area, 2))
     imgpoints_right = np.reshape(imgpoints_right, (N_OK, 1, board_area, 2))
 
-    rms, K_left, D_left, K_right, D_right, R, T = cv.fisheye.stereoCalibrate(
+    rms, new_K_left, new_D_left, new_K_right, new_D_right, R, T = cv.fisheye.stereoCalibrate(
         objectPoints=objpoints,
         imagePoints1=imgpoints_left,
         imagePoints2=imgpoints_right,
@@ -82,10 +87,10 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     return dict(
         rms=rms,
         individual_calibration=calibration_data,
-        K_left=K_left,
-        D_left=D_left,
-        K_right=K_right,
-        D_right=D_right,
+        K_left=new_K_left,
+        D_left=new_D_left,
+        K_right=new_K_right,
+        D_right=new_D_right,
         R=R,
         T=T,
     )
@@ -133,6 +138,25 @@ def load_stereo_calibration(calibration_file) -> dict:
         return None
 
 
+def print_calibration(calibration):
+    """ Pretty print stereo fisheye calibration parameters """
+
+    with np.printoptions(precision=3, suppress=True):
+        print('K Left')
+        print(calibration['K_left'])
+        print('K Right')
+        print(calibration['K_right'])
+        print('D Left')
+        print(calibration['D_left'])
+        print('D Right')
+        print(calibration['D_right'])
+
+        print('R')
+        print(calibration['R'])
+        print('T')
+        print(calibration['T'])
+
+
 class CalibratedStereoFisheyeCamera:
     """ A Calibrated stereo fish-eye camera """
 
@@ -154,9 +178,7 @@ class CalibratedStereoFisheyeCamera:
             logger.error(f'Calibration file {calibration_file} does not exist')
             self.calibration = None
 
-        with np.printoptions(precision=3, suppress=True):
-            print(self.calibration)
-
+        print_calibration(self.calibration)
         self.set_stereo_rectify_parameters()
 
     def set_calibration(self, calibration):
