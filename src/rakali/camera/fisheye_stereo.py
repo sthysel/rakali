@@ -19,13 +19,9 @@ logger = logging.getLogger(__name__)
 
 CALIBRATE_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
 
-#CALIBRATE_FLAGS = cv.fisheye.CALIB_FIX_INTRINSIC
-
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
-    """
-    do stereo calibration using pre-calibration values from left and right eyes
-    """
+    """ do stereo calibration using pre-calibration values from left and right eyes """
 
     print('Calibrate Fisheye Stereo camera using pre-calibrated values')
 
@@ -75,7 +71,7 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     # print(imgpoints_left.shape)
     # print(imgpoints_right.shape)
 
-    rms, new_K_left, new_D_left, new_K_right, new_D_right, R, T = cv.fisheye.stereoCalibrate(
+    rms, new_K_left, new_D_left, new_K_right, new_D_right, new_R, new_T = cv.fisheye.stereoCalibrate(
         objectPoints=objpoints,
         imagePoints1=imgpoints_left,
         imagePoints2=imgpoints_right,
@@ -84,8 +80,8 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
         K2=K_right,
         D2=D_right,
         imageSize=img_size,
-        # R=R,
-        # T=T,
+        R=R,
+        T=T,
         flags=CALIBRATE_FLAGS,
         criteria=STOP_CRITERIA,
     )
@@ -99,8 +95,8 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
         D_left=new_D_left,
         K_right=new_K_right,
         D_right=new_D_right,
-        R=R,
-        T=T,
+        R=new_R,
+        T=new_T,
     )
     print_calibration(calibration)
     return calibration
@@ -217,9 +213,8 @@ class CalibratedStereoFisheyeCamera:
         return datetime.fromtimestamp(self.calibration_time)
 
     def set_stereo_rectify_parameters(self):
-        """
-        set rotation matrices
-        """
+        """ set rotation matrices """
+
         self.R_left, self.R_right, self.P1, self.P2, self.Q = cv.fisheye.stereoRectify(
             K1=self.calibration['K_left'],
             D1=self.calibration['D_left'],
@@ -229,6 +224,7 @@ class CalibratedStereoFisheyeCamera:
             R=self.calibration['R'],
             tvec=self.calibration['T'],
             flags=cv.CALIB_ZERO_DISPARITY,
+            #newImageSize=self.calibration['image_size'],
             balance=self.balance,
             fov_scale=1,
         )
@@ -244,8 +240,8 @@ class CalibratedStereoFisheyeCamera:
                 D=self.calibration['D_left'],
                 R=self.R_left,
                 balance=self.balance,
-                dim2=self.dim2,
-                dim3=self.dim3,
+                # dim2=self.dim2,
+                # dim3=self.dim3,
             )
             self.right_map1, self.right_map2 = get_maps(
                 img=first_frame,
@@ -254,8 +250,8 @@ class CalibratedStereoFisheyeCamera:
                 D=self.calibration['D_right'],
                 R=self.R_right,
                 balance=self.balance,
-                dim2=self.dim2,
-                dim3=self.dim3,
+                # dim2=self.dim2,
+                # dim3=self.dim3,
             )
         else:
             logger.error('Load calibration before setting the maps')

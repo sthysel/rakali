@@ -152,7 +152,7 @@ def cli(
         image_points = random.choices(image_points, k=pick_size)
         object_points = object_points[:pick_size]
 
-        rms, K, D = fisheye.calibrate(
+        rms, K, D, rvecs, tvecs = fisheye.calibrate(
             object_points=object_points,
             image_points=image_points,
             image_size=image_size,
@@ -161,6 +161,8 @@ def cli(
             rms=rms,
             K=K,
             D=D,
+            rvecs=rvecs,
+            tvecs=tvecs,
             image_points=image_points,
             object_points=object_points,
             image_size=image_size,

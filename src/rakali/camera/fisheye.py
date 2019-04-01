@@ -1,6 +1,4 @@
-"""
-Fisheye camera support
-"""
+""" Fisheye camera support """
 
 import json
 import logging
@@ -34,7 +32,7 @@ def calibrate(object_points, image_points, image_size):
     rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(obj_length)]
     tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(obj_length)]
 
-    rms, _, _, _, _ = cv.fisheye.calibrate(
+    ret, Kn, Dn, rvecsn, tvecsn = cv.fisheye.calibrate(
         objectPoints=object_points,
         imagePoints=image_points,
         image_size=image_size,
@@ -46,13 +44,15 @@ def calibrate(object_points, image_points, image_size):
         criteria=STOP_CRITERIA,
     )
 
-    return rms, K, D
+    return ret, Kn, Dn, rvecsn, tvecsn
 
 
 def save_calibration(
     calibration_file: str,
     K,
     D,
+    rvecs,
+    tvecs,
     image_size: Tuple[int, int],
     salt: int,
     pick_size: int,
@@ -66,6 +66,8 @@ def save_calibration(
     data = dict(
         K=K,
         D=D,
+        rvecs=rvecs,
+        tvecs=tvecs,
         image_size=image_size,
         salt=salt,
         pick_size=pick_size,
@@ -88,6 +90,8 @@ def load_calibration(calibration_file):
             return dict(
                 K=np.asarray(cal['K']),
                 D=np.asarray(cal['D']),
+                rvecs=np.asarray(cal['rvecs']),
+                tvecs=np.asarray(cal['tvecs']),
                 image_size=tuple(cal['image_size']),
                 salt=cal['salt'],
                 pick_size=cal['pick_size'],
