@@ -97,13 +97,13 @@ class DisparityTuner:
         self.speckle_size = 100
         self.speckle_range = 32
 
-        cv.createTrackbar('Window Size', 'disparity', self.window_size, 20, self.on_window_size)
-        cv.createTrackbar('Minimum Disparity ', 'disparity', self.min_disp, 16 * 10, self.on_min_disparity)
+        cv.createTrackbar('Window Size', 'disparity', self.window_size, 15, self.on_window_size)
+        cv.createTrackbar('Minimum Disparity ', 'disparity', self.min_disp, 16 * 5, self.on_min_disparity)
         cv.createTrackbar('Max diff ', 'disparity', self.disp12_max_diff, 200, self.on_max_diff)
         cv.createTrackbar('Uniqueness', 'disparity', self.uniqueness, 100, self.on_uniqueness)
         cv.createTrackbar('Speckle Size', 'disparity', self.speckle_size, 1000, self.on_speckle_size)
         cv.createTrackbar('Speckle Range', 'disparity', self.speckle_range, 1000, self.on_speckle_range)
-        cv.createTrackbar('Block Size', 'disparity', self.block_size, 100, self.on_block_size)
+        cv.createTrackbar('Block Size', 'disparity', self.block_size, 30, self.on_block_size)
 
     def on_min_disparity(self, val):
         if val % 16 == 0:

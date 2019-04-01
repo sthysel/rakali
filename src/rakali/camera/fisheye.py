@@ -19,13 +19,12 @@ from .save import NumpyEncoder
 logger = logging.getLogger(__name__)
 
 STOP_CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-CAL_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+CALIBRATE_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
 
 
 def calibrate(object_points, image_points, image_size):
-    """
-    Calibrate the  camera using image points
-    """
+    """ Calibrate the camera using image points """
+
     obj_length = len(object_points)
     print(f'Calibrating on {obj_length} objects...')
 
@@ -43,7 +42,7 @@ def calibrate(object_points, image_points, image_size):
         D=D,
         rvecs=rvecs,
         tvecs=tvecs,
-        flags=CAL_FLAGS,
+        flags=CALIBRATE_FLAGS,
         criteria=STOP_CRITERIA,
     )
 

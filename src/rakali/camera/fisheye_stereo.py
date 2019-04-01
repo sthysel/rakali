@@ -12,10 +12,14 @@ import numpy as np
 import cv2 as cv
 from rakali.video.fps import cost
 
-from .fisheye import CAL_FLAGS, STOP_CRITERIA, get_maps, undistort
+from .fisheye import STOP_CRITERIA, get_maps, undistort
 from .save import NumpyEncoder
 
 logger = logging.getLogger(__name__)
+
+CALIBRATE_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+
+#CALIBRATE_FLAGS = cv.fisheye.CALIB_FIX_INTRINSIC
 
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
@@ -80,9 +84,9 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
         K2=K_right,
         D2=D_right,
         imageSize=img_size,
-        R=R,
-        T=T,
-        flags=CAL_FLAGS,
+        # R=R,
+        # T=T,
+        flags=CALIBRATE_FLAGS,
         criteria=STOP_CRITERIA,
     )
 
