@@ -163,6 +163,25 @@ def print_calibration(calibration):
         print(calibration['T'])
 
 
+def calibration_labels(calibration, side):
+    """calibration labels for annotating frames"""
+    labels = []
+    if side == 'left':
+        with np.printoptions(precision=3, suppress=True):
+            labels.extend('K\n{K_left}'.format(**calibration).split('\n'))
+            labels.extend('D\n{D_left}'.format(**calibration).split('\n'))
+            labels.extend('R\n{R}'.format(**calibration).split('\n'))
+            labels.extend('T\n{T}'.format(**calibration).split('\n'))
+
+    if side == 'right':
+        with np.printoptions(precision=3, suppress=True):
+            labels.extend('K\n{K_right}'.format(**calibration).split('\n'))
+            labels.extend('D\n{D_right}'.format(**calibration).split('\n'))
+            labels.extend('R\n{R}'.format(**calibration).split('\n'))
+            labels.extend('T\n{T}'.format(**calibration).split('\n'))
+    return labels
+
+
 class CalibratedStereoFisheyeCamera:
     """ A Calibrated stereo fish-eye camera """
 

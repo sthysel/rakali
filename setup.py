@@ -25,6 +25,7 @@ setup(
             'rakali-calibrate-fisheye-stereo=rakali.cli.calibrate_fisheye_stereo:cli',
             'rakali-undistort-pinhole=rakali.cli.undistort_pinhole:cli',
             'rakali-undistort-fisheye=rakali.cli.undistort_fisheye:cli',
+            'rakali-undistort-fisheye-stereo=rakali.cli.view_stereo_feed_corrected:cli',
             'rakali-undistort-fisheye-image=rakali.cli.undistort_fisheye_image:cli',
             'rakali-disparity-fisheye-pair=rakali.cli.disparity_fisheye:cli',
             'rakali-view=rakali.cli.view_feed:cli',

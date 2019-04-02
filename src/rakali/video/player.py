@@ -1,6 +1,4 @@
-"""
-Plays video
-"""
+""" Plays video """
 
 import sys
 
@@ -12,7 +10,8 @@ from .reader import VideoStream
 
 class VideoPlayer:
     """
-    Plays videos
+    Plays videos, optionally calling `frame_callback` with every frame as
+    parameter
     """
 
     def __init__(
@@ -39,7 +38,7 @@ class VideoPlayer:
         """Scale the resulting video display to better fit"""
 
         if self.scale != 1:
-            return imutils.resize(img, width=int(img.shape[1] * self.resize))
+            return imutils.resize(img, width=int(img.shape[1] * self.scale))
         else:
             return img
 
