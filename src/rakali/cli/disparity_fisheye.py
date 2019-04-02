@@ -1,6 +1,4 @@
-"""
-Show disparity map for rectified stereo fish eye images
-"""
+""" Show disparity map for rectified stereo fish eye images """
 
 import sys
 from pathlib import Path
@@ -156,7 +154,7 @@ class DisparityTuner:
 
 
 def get_frames(chessboards_folder, image_number):
-    """get stereo frame pair """
+    """get stereo frame pair from chessboard capture folder"""
 
     frames = []
     source = Path(chessboards_folder).expanduser()
@@ -171,8 +169,21 @@ def get_frames(chessboards_folder, image_number):
         if not file_path.exists():
             print(f'{side} image file {file_path} does not exist')
             sys.exit()
-        frames.append(cv.imread(str(file_path)))
+        img = cv.imread(str(file_path))
+        img = add_frame_labels(img, labels=[f'{file_path}'])
+        img = markup_frame(img)
+        frames.append(img)
     return frames
+
+
+def markup_frame(img):
+    """ adds markup to frame for warp debug"""
+
+    h, w = img.shape[:2]
+    center = (int(w / 2), int(h / 2))
+    for r in range(50, 300, 30):
+        cv.circle(img=img, center=center, radius=r, lineType=cv.LINE_8, color=colors.get('GREEN'), thickness=3)
+    return img
 
 
 def label_frame(camera, frame):
