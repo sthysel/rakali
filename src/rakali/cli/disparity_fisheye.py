@@ -8,7 +8,7 @@ import cv2 as cv
 import numpy as np
 
 from rakali.annotate import add_frame_labels, colors
-from rakali.camera.fisheye_stereo import CalibratedStereoFisheyeCamera
+from rakali.camera.fisheye_stereo import CalibratedStereoFisheyeCamera, calibration_labels
 from rakali import transforms
 
 
@@ -67,6 +67,10 @@ def cli(image_number, chessboards_folder, calibration_file, balance, scale):
     # unwarp pair images
     rectified = camera.correct(left_frame, right_frame)
 
+    # add calibration info
+    left_frame = add_calib_info(camera, left_frame, 'left')
+    right_frame = add_calib_info(camera, right_frame, 'right')
+
     # display them
     original = np.hstack((left_frame, right_frame))
     corrected = np.hstack(rectified)
@@ -76,7 +80,7 @@ def cli(image_number, chessboards_folder, calibration_file, balance, scale):
     # stereo = cv.StereoBM_create(numDisparities=16 * 4, blockSize=15)
     cv.namedWindow('disparity')
 
-    tuner = DisparityTuner(rectified)
+    tuner = DisparityTuner(rectified, camera)
     tuner.refresh()
     while True:
         if cv.waitKey(1) & 0xFF == ord('q'):
@@ -84,8 +88,10 @@ def cli(image_number, chessboards_folder, calibration_file, balance, scale):
 
 
 class DisparityTuner:
-    def __init__(self, pair):
+    def __init__(self, pair, camera):
         self.rectified_pair = pair
+        self.camera = camera
+
         self.window_size = 8
         self.min_disp = 16
         self.block_size = 16
@@ -171,18 +177,43 @@ def get_frames(chessboards_folder, image_number):
             sys.exit()
         img = cv.imread(str(file_path))
         img = add_frame_labels(img, labels=[f'{file_path}'])
-        img = markup_frame(img)
+        img = add_reticle(img)
         frames.append(img)
     return frames
 
 
-def markup_frame(img):
+def add_calib_info(camera, img, side):
+    """label the corrected frames to aid in diagnostics """
+
+    return add_frame_labels(
+        frame=img,
+        labels=calibration_labels(camera.calibration, side),
+        color=colors.get('BLACK'),
+    )
+
+
+def add_reticle(img):
     """ adds markup to frame for warp debug"""
 
+    olive = colors.get('OLIVE')
     h, w = img.shape[:2]
-    center = (int(w / 2), int(h / 2))
-    for r in range(50, 300, 30):
-        cv.circle(img=img, center=center, radius=r, lineType=cv.LINE_8, color=colors.get('GREEN'), thickness=3)
+    cx, cy = (int(w / 2), int(h / 2))
+    center = cx, cy
+    # circles
+    for r in range(50, 300, 100):
+        cv.circle(img=img, center=center, radius=r, lineType=cv.LINE_8, color=olive, thickness=1)
+
+    # space
+    for y in range(0, h, int(h / 20)):
+        cv.line(img=img, pt1=(0, y), pt2=(w, y), color=olive, lineType=cv.LINE_4, thickness=1)
+        if y == cy:
+            cv.line(img=img, pt1=(0, y), pt2=(w, y), color=olive, lineType=cv.LINE_4, thickness=3)
+
+    for x in range(0, w, int(w / 20)):
+        cv.line(img=img, pt1=(x, 0), pt2=(x, h), color=olive, lineType=cv.LINE_4, thickness=1)
+        if x == cx:
+            cv.line(img=img, pt1=(x, 0), pt2=(x, h), color=olive, lineType=cv.LINE_4, thickness=3)
+
     return img
 
 

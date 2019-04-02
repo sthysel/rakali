@@ -113,9 +113,10 @@ def cli(left_eye, right_eye, calibration_file, balance, scale):
                     ))
                     # label corrected frame
                     annotated_rectified.append(
-                        decorate_corrected_frame(
-                            corrected_frame,
-                            calibration_labels_per_side[side],
+                        add_frame_labels(
+                            frame=corrected_frame,
+                            labels=calibration_labels_per_side[side],
+                            color=colors.get('BLACK'),
                         )
                     )
 
@@ -123,15 +124,6 @@ def cli(left_eye, right_eye, calibration_file, balance, scale):
                 corrected = np.hstack(annotated_rectified)
                 stack = np.vstack((orig, corrected))
                 player.show(stack)
-
-
-def decorate_corrected_frame(frame, labels):
-    img = add_frame_labels(
-        frame=frame,
-        labels=labels,
-        color=colors.get('BLACK'),
-    )
-    return img
 
 
 def decorate_frame(frame, side, count, source):
