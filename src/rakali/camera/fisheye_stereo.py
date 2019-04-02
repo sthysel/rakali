@@ -243,7 +243,6 @@ class CalibratedStereoFisheyeCamera:
             R=self.calibration['R'],
             tvec=self.calibration['T'],
             flags=cv.CALIB_ZERO_DISPARITY,
-            #newImageSize=self.calibration['image_size'],
             balance=self.balance,
             fov_scale=1,
         )
