@@ -23,25 +23,25 @@ class FPS:
     """
 
     def __init__(self):
-        self.start = None
-        self.stop = None
-        self.frames = 0
+        self._start = None
+        self._stop = None
+        self._frames = 0
 
-    def begin(self):
+    def start(self):
         """start the timer"""
-        self.start = time.perf_counter()
+        self._start = time.perf_counter()
         return self
 
-    def done(self):
+    def stop(self):
         """stop the timer """
-        self.end = time.perf_counter()
-        self.frames += 1
+        self._stop = time.perf_counter()
+        self._frames += 1
 
     def cost(self):
         """
         operation time cost
         """
-        return self.end - self.start
+        return self._stop - self._start
 
     def cost_in_ms(self):
         """

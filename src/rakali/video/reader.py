@@ -119,6 +119,11 @@ class VideoStream(Thread):
         self.frame = np.zeros((self.height, self.width, 3), np.uint8)
 
         self.frame_count = 0
+        self.read_count = 0
+
+    def dropped(self):
+        """number of frames that was not read"""
+        return self.frame_count - self.read_count
 
     def _pick_source(self, source):
         """
@@ -157,9 +162,9 @@ class VideoStream(Thread):
             self.frame_count += 1
         self.stream.release()
 
-    @cost
     def read(self):
         """Return the latest frame """
+        self.read_count += 1
         return self.grabbed, self.frame
 
     def copy(self):
