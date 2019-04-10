@@ -21,7 +21,7 @@ except ImportError:
     print(advice)
     sys.exit()
 
-version = '0.0.9'
+version = '0.0.10'
 
 from .video.reader import VideoStream
 from .video.writer import VideoWriter
