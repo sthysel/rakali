@@ -20,6 +20,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
+NVR='192.168.1.20'
 
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
@@ -27,14 +28,14 @@ logger = logging.getLogger(__name__)
     '-l',
     '--left-eye',
     help='Left eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
-    default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1",
+    default=f"http://{NVR}/axis-cgi/mjpg/video.cgi?&camera=1",
     show_default=True,
 )
 @click.option(
     '-r',
     '--right-eye',
     help='Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
-    default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=2",
+    default=f"http://{NVR}/axis-cgi/mjpg/video.cgi?&camera=2",
     show_default=True,
 )
 @click.option(

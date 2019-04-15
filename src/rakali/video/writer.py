@@ -16,7 +16,7 @@ class VideoWriter:
         self,
         size=SIZE,
         file_name='out.avi',
-        fps=6.0,  # this is a bit arb FIXME
+        fps=10,  # this is a bit arb FIXME
         color=True,
         codec='MJPG',
     ):

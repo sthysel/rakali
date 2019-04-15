@@ -19,6 +19,7 @@ class VideoFile:
         self.stream = cv.VideoCapture(src)
         self.width = int(self.stream.get(cv.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.stream.get(cv.CAP_PROP_FRAME_HEIGHT))
+        self.fps = self.stream.get(cv.CAP_PROP_FPS)
 
     def size(self):
         return self.width, self.height
