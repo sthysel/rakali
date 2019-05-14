@@ -113,6 +113,9 @@ class VideoStream(Thread):
         self.stopped = False
         self.name = name
 
+        self.fps = self.stream.get(cv.CAP_PROP_FPS)
+        self.stream.set(cv.CAP_PROP_FPS, int(self.fps))
+
         # ensure a frame is ready by faking it up, this saves a lot of ugly
         # fencing code later on
         self.width = int(self.stream.get(cv.CAP_PROP_FRAME_WIDTH))
