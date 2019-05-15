@@ -6,6 +6,7 @@ import numpy as np
 from rakali.video.fps import cost
 
 import queue
+import time
 
 
 class VideoFile:
@@ -105,7 +106,12 @@ class VideoStream(Thread):
     Use this when real-time processing is required
     """
 
-    def __init__(self, src=0, name='video stream'):
+    def __init__(
+        self,
+        src=0,
+        name='video stream',
+        fps=0,
+    ):
         super().__init__()
 
         self.stream = cv.VideoCapture(self._pick_source(src))
@@ -113,8 +119,14 @@ class VideoStream(Thread):
         self.stopped = False
         self.name = name
 
-        self.fps = self.stream.get(cv.CAP_PROP_FPS)
-        self.stream.set(cv.CAP_PROP_FPS, int(self.fps))
+        # when reading from a file its sometimes useful to replay at a given
+        # rate
+        self._replay_delay = False
+        if fps:
+            self.fps = fps
+            self._replay_delay = True
+        else:
+            self.fps = self.stream.get(cv.CAP_PROP_FPS)
 
         # ensure a frame is ready by faking it up, this saves a lot of ugly
         # fencing code later on
@@ -164,6 +176,9 @@ class VideoStream(Thread):
         while not self.stopped:
             self.grabbed, self.frame = self.stream.read()
             self.frame_count += 1
+            if self._replay_delay:
+                time.sleep(1 / self.fps)
+
         self.stream.release()
 
     def read(self):
