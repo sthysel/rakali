@@ -16,7 +16,7 @@ class VideoWriter:
         self,
         size=SIZE,
         file_name='out.avi',
-        fps=10,  # this is a bit arb FIXME
+        fps=15,
         color=True,
         codec='MJPG',
     ):
@@ -36,20 +36,21 @@ class VideoWriter:
 
     def set_size(self, size):
         """set video frame size"""
-        self.writer = cv.VideoWriter(
-            filename=self.file_name,
-            fourcc=cv.VideoWriter_fourcc(*self.codec),
-            fps=self.fps,
-            frameSize=self.size,
-            isColor=self.color,
-        )
+        if size != self.size:
+            self.writer.release()
+            logger.debug(f'Reset frame size to {size}')
+            self.writer = cv.VideoWriter(
+                filename=self.file_name,
+                fourcc=cv.VideoWriter_fourcc(*self.codec),
+                fps=self.fps,
+                frameSize=self.size,
+                isColor=self.color,
+            )
+            self.size = size
 
-    def noise(self, frame_count=100):
-        """generate test noise frames"""
-        for frame in range(frame_count):
-            self.writer.write(np.random.randint(0, 255, self.size).astype('uint8'))
-
-        self.writer.release()
+    def write_noise(self):
+        """write test noise frame"""
+        self.writer.write(np.random.randint(0, 255, self.size).astype('uint8'))
 
     def write(self, frame):
         """write video frame to file"""
