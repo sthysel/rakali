@@ -1,19 +1,16 @@
-from threading import Thread
-
-import cv2 as cv
-import numpy as np
-
-from rakali.video.fps import cost
-
 import queue
 import time
+from threading import Thread
+
+import numpy as np
+
+import cv2 as cv
+from rakali.video.fps import cost
 
 
 class VideoFile:
     """
-    OpenCV has a tendency to present video streams from files at the recorded
-    tempo, and this is generally useful until you need to post-process video at
-    max speed, at which time it becomes a enormous PITA
+    Convenience interface to read video files
     """
 
     def __init__(self, src=0):
