@@ -2,9 +2,8 @@ import queue
 import time
 from threading import Thread
 
-import numpy as np
-
 import cv2 as cv
+import numpy as np
 from rakali.video.fps import cost
 
 
@@ -93,6 +92,63 @@ class VideoFrameEnqueuer(Thread):
 
     def __exit__(self, type, value, traceback):
         self.stopped = True
+
+
+class VideoStreamReader:
+    """
+    Reader of video streams
+    - Arguments:
+        - url_or_deviceid: (int or str) The url, filesystem path or id of the  video stream.
+        - retries: (int) If there are errors reading the stream, how many times to retry.
+    """
+
+    def __init__(self, url_or_deviceid, retries=0):
+        self._url_or_deviceid = url_or_deviceid
+        self._video = None
+        self._frame_count = 0
+        self.retries = retries
+        self._retries_count = 0
+
+    def open(self):
+        """
+        Opens the video stream
+        """
+        if self._video is None:
+            self._video = cv.VideoCapture(self._url_or_deviceid)
+
+    def close(self):
+        """
+        Releases the video stream object
+        """
+        if self._video and self._video.isOpened():
+            self._video.release()
+
+    def next(self):
+        """
+        - Returns:
+            - frame no / index  : integer value of the frame read
+            - frame: np.array of shape (h, w, 3)
+
+        - Raises:
+            - StopIteration: after it finishes reading the video  file  \
+                or if it reaches the number of retries without success.
+
+        """
+
+        while self._retries_count <= self.retries:
+            if self._video.isOpened():
+                success, frame = self._video.read()
+                self._frame_count += 1
+                if not success:
+                    if self._video.isOpened():
+                        self._video.release()
+                    self._video = cv.VideoCapture(self._url_or_deviceid)
+                else:
+                    return (self._frame_count, frame)
+            else:
+                self._video = cv.VideoCapture(self._url_or_deviceid)
+            self._retries_count += 1
+        raise StopIteration()
 
 
 class VideoStream(Thread):
