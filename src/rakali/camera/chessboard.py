@@ -6,7 +6,7 @@ import glob
 import json
 import os
 import sys
-from typing import Tuple
+from typing import List, Optional, Tuple
 
 import cv2 as cv
 import numpy as np
@@ -54,7 +54,7 @@ class ChessboardFinder:
         return corners
 
     def corners(self, frame, fast=True):
-        """ Get the corners for calibration"""
+        """Get the corners for calibration"""
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ret, corners = self.get_chessboard_corners(gray, fast=fast)
         if ret:
@@ -64,7 +64,7 @@ class ChessboardFinder:
 
     @cost
     def has_chessboard(self, frame):
-        """boolean test for chessboard pressense in frame """
+        """boolean test for chessboard pressense in frame"""
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         ret, _ = self.get_chessboard_corners(gray=gray)
         return ret
@@ -74,8 +74,8 @@ class ChessboardFinder:
         return cv.drawChessboardCorners(frame, self.size, corners, True)
 
 
-def load_image_points_file(save_file) -> Tuple[list, list, tuple]:
-    """load from previously computed file """
+def load_image_points_file(save_file) -> Optional[Tuple[List, List, Tuple]]:
+    """load from previously computed file"""
 
     print(f"Loading previously computed image points from {save_file}")
     try:
@@ -164,10 +164,10 @@ def filter_unusable_pairs(
     boards_path,
     chessboard_size,
 ):
-    """ Run through image set and remove all pairs that fail the quality test"""
+    """Run through image set and remove all pairs that fail the quality test"""
 
     def remove_pair(filename):
-        """remove complementary pair if one of the pair is unfit """
+        """remove complementary pair if one of the pair is unfit"""
         print(f"Removing complementary pair of which {filename} is part")
         _, rest = filename.split("_")
         pair = glob.glob(str(boards_path / f"*_{rest}"))

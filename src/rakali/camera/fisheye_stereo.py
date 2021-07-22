@@ -6,6 +6,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import Dict, Optional
 
 import cv2 as cv
 import numpy as np
@@ -24,7 +25,7 @@ CALIBRATE_FLAGS = (
 
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
-    """ do stereo calibration using pre-calibration values from left and right eyes """
+    """do stereo calibration using pre-calibration values from left and right eyes"""
 
     print("Calibrate Fisheye Stereo camera using pre-calibrated values")
 
@@ -123,7 +124,7 @@ def save_stereo_calibration(
     pick_size: int,
     cid: str,
 ):
-    """" Save calibration data """
+    """ " Save calibration data"""
 
     calibration_parameters["image_size"] = image_size
     calibration_parameters["salt"] = salt
@@ -137,8 +138,8 @@ def save_stereo_calibration(
         f.write(dumped)
 
 
-def load_stereo_calibration(calibration_file) -> dict:
-    """load from previously computed file """
+def load_stereo_calibration(calibration_file) -> Optional[Dict]:
+    """load from previously computed file"""
 
     print(f"Loading previously computed stereo calibration from {calibration_file}")
     try:
@@ -160,7 +161,7 @@ def load_stereo_calibration(calibration_file) -> dict:
 
 
 def print_calibration(calibration):
-    """ Pretty print stereo fisheye calibration parameters """
+    """Pretty print stereo fisheye calibration parameters"""
 
     with np.printoptions(precision=3, suppress=True):
         print("K Left")
@@ -198,7 +199,7 @@ def calibration_labels(calibration, side):
 
 
 class CalibratedStereoFisheyeCamera:
-    """ A Calibrated stereo fish-eye camera """
+    """A Calibrated stereo fish-eye camera"""
 
     def __init__(
         self,
@@ -245,11 +246,11 @@ class CalibratedStereoFisheyeCamera:
 
     @property
     def calibration_time_formatted(self):
-        """ formated calibration time """
+        """formated calibration time"""
         return datetime.fromtimestamp(self.calibration_time)
 
     def set_stereo_rectify_parameters(self):
-        """ set rotation matrices """
+        """set rotation matrices"""
 
         self.R_left, self.R_right, self.P1, self.P2, self.Q = cv.fisheye.stereoRectify(
             K1=self.calibration["K_left"],
