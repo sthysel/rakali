@@ -14,6 +14,8 @@ to be used as a pedagogical resource for those.
 
 Named after Hydromys chrysogaster, the Australian Otter
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sthysel/rakali/master.svg)](https://results.pre-commit.ci/latest/github/sthysel/rakali/master)
+
 # Provided tools
 
 Rakali ships with a number of tools that assists working with mono and stereo
