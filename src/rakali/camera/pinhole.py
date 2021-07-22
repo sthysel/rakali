@@ -8,7 +8,6 @@ from pathlib import Path
 
 import cv2 as cv
 import numpy as np
-
 from rakali.video.fps import cost
 
 logging.basicConfig(level=logging.DEBUG)
@@ -26,8 +25,14 @@ def calibrate(object_points, image_points, image_size):
     """
     Calibrate the pinhole camera using image points
     """
-    logging.debug('Calibrating...')
-    _, camera_matrix, distortion_coefficients, rotation, translation = cv.calibrateCamera(
+    logging.debug("Calibrating...")
+    (
+        _,
+        camera_matrix,
+        distortion_coefficients,
+        rotation,
+        translation,
+    ) = cv.calibrateCamera(
         objectPoints=object_points,
         imagePoints=image_points,
         imageSize=image_size,
@@ -99,20 +104,20 @@ def save_calibration(
 
 def load_calibration(calibration_file):
     """Load pinhole calibration"""
-    logger.debug(f'Loading calibration data from {calibration_file}')
+    logger.debug(f"Loading calibration data from {calibration_file}")
     cal = np.load(calibration_file)
     return dict(
-        camera_matrix=cal['camera_matrix'],
-        new_camera_matrix=cal['new_camera_matrix'],
-        roi=cal['roi'],
-        distortion_coefficients=cal['distortion_coefficients'],
-        rotation=cal['rotation'],
-        translation=cal['translation'],
-        salt=int(cal['salt']),
-        pick_size=int(cal['pick_size']),
-        error=float(cal['error']),
-        cid=str(cal['cid']),
-        time=float(cal['time']),
+        camera_matrix=cal["camera_matrix"],
+        new_camera_matrix=cal["new_camera_matrix"],
+        roi=cal["roi"],
+        distortion_coefficients=cal["distortion_coefficients"],
+        rotation=cal["rotation"],
+        translation=cal["translation"],
+        salt=int(cal["salt"]),
+        pick_size=int(cal["pick_size"]),
+        error=float(cal["error"]),
+        cid=str(cal["cid"]),
+        time=float(cal["time"]),
     )
 
 
@@ -120,10 +125,10 @@ def load_calibration(calibration_file):
 def undistort(img, calibration):
     img = cv.undistort(
         src=img,
-        cameraMatrix=calibration['camera_matrix'],
-        distCoeffs=calibration['distortion_coefficients'],
+        cameraMatrix=calibration["camera_matrix"],
+        distCoeffs=calibration["distortion_coefficients"],
         dst=None,
-        newCameraMatrix=calibration['new_camera_matrix'],
+        newCameraMatrix=calibration["new_camera_matrix"],
     )
     return img
 
@@ -134,13 +139,13 @@ class CalibratedPinholeCamera:
     def __init__(
         self,
         calibration_file,
-        name='pinhole',
+        name="pinhole",
     ):
         self.name = name
         if Path(calibration_file).exists():
             self.calibration = load_calibration(calibration_file=calibration_file)
         else:
-            logger.error(f'Calibration file {calibration_file} does not exist')
+            logger.error(f"Calibration file {calibration_file} does not exist")
 
     def set_calibration(self, calibration):
         """set calibration"""
@@ -151,15 +156,15 @@ class CalibratedPinholeCamera:
     def cid(self):
         """calibration id"""
         if self.calibration:
-            return self.calibration.get('cid', 'UNSET')
+            return self.calibration.get("cid", "UNSET")
         else:
-            return 'UNSET'
+            return "UNSET"
 
     @property
     def calibration_time(self):
         """calibration time"""
         if self.calibration:
-            return self.calibration.get('time', -1)
+            return self.calibration.get("time", -1)
         else:
             return -1
 

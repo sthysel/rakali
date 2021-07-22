@@ -2,16 +2,17 @@
 This module provides some common helper functions to write on top of a image
 """
 
-import cv2 as cv
-from . import colors
 import cpuinfo
+import cv2 as cv
 import GPUtil
+
+from . import colors
 
 DEFAULT_POSITION = (10, 30)
 FONT = cv.FONT_HERSHEY_SIMPLEX
 FONT_SCALE = 0.75
 THICKNESS = 2
-COLOR = colors.get('BLACK')
+COLOR = colors.get("BLACK")
 
 
 def GPU_label():
@@ -19,11 +20,11 @@ def GPU_label():
     GPUs = GPUtil.getGPUs()
     labels = []
     for i, GPU in enumerate(GPUs):
-        labels.append(f'GPU{i}: {GPU.name}')
-        labels.append(f'Load: {GPU.load:.2f}')
-        labels.append(f'Temp: {GPU.temperature}')
+        labels.append(f"GPU{i}: {GPU.name}")
+        labels.append(f"Load: {GPU.load:.2f}")
+        labels.append(f"Temp: {GPU.temperature}")
 
-    return ', '.join(labels)
+    return ", ".join(labels)
 
 
 def CPU_label():
@@ -40,14 +41,14 @@ def add_frame_labels(
     font=FONT,
     font_scale=FONT_SCALE,
     thickness=THICKNESS,
-    color=colors.get('BHP'),
+    color=colors.get("BHP"),
     labels=[],
 ):
     """
     Write each label on the image beginning at position being top left
     """
 
-    text_size, _ = cv.getTextSize('sample text', font, font_scale, thickness)
+    text_size, _ = cv.getTextSize("sample text", font, font_scale, thickness)
     line_height = text_size[1] + line_space
     line_type = cv.LINE_AA
 

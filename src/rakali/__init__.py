@@ -15,15 +15,16 @@ $ yay -S opencv-cuda
 """
 
 import sys
+
 try:
     import cv2
 except ImportError:
     print(advice)
     sys.exit()
 
-version = '0.0.10'
+version = "0.0.10"
 
+from .img import Image, ImageSize
+from .video.player import VideoPlayer
 from .video.reader import VideoStream
 from .video.writer import VideoWriter
-from .video.player import VideoPlayer
-from .img import Image, ImageSize

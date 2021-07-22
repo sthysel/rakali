@@ -9,7 +9,7 @@ from ..img import Image
 from ..testimages import rakali
 
 
-class OptionConfig(object):
+class OptionConfig:
     def __init__(self):
         pass
 
@@ -20,24 +20,24 @@ option_config = click.make_pass_decorator(OptionConfig, ensure=True)
 @click.group(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.option(
-    '-i',
-    '--input-file',
+    "-i",
+    "--input-file",
     type=click.Path(),
-    help='Use file',
+    help="Use file",
     show_default=True,
 )
 @click.option(
-    '-u',
-    '--input-url',
-    help='Fetch image from URL',
+    "-u",
+    "--input-url",
+    help="Fetch image from URL",
     show_default=True,
 )
 @click.option(
-    '-o',
-    '--output-file',
+    "-o",
+    "--output-file",
     type=click.Path(),
-    default='out.jpg',
-    help='Output file',
+    default="out.jpg",
+    help="Output file",
     show_default=True,
 )
 @option_config
@@ -97,10 +97,10 @@ def skeletonize(config):
 
 
 @click.option(
-    '-a',
-    '--angle',
+    "-a",
+    "--angle",
     default=45.0,
-    help='Rotate image by degrees',
+    help="Rotate image by degrees",
     show_default=True,
 )
 @cli.command()
@@ -114,10 +114,10 @@ def rotate(config, angle):
 
 
 @click.option(
-    '-a',
-    '--angle',
+    "-a",
+    "--angle",
     default=45.0,
-    help='Rotate image by degrees',
+    help="Rotate image by degrees",
     show_default=True,
 )
 @cli.command()
@@ -131,17 +131,17 @@ def rotate_bounded(config, angle):
 
 
 @click.option(
-    '-w',
-    '--width',
+    "-w",
+    "--width",
     type=click.INT,
-    help='Width of resized image',
+    help="Width of resized image",
     show_default=True,
 )
 @click.option(
-    '-h',
-    '--height',
+    "-h",
+    "--height",
     type=click.INT,
-    help='Height of resized image',
+    help="Height of resized image",
     show_default=True,
 )
 @cli.command()
@@ -154,4 +154,4 @@ def resize(config, width, height):
         img.resize(width=width, height=height).show()
         img.write(config.output_file.name)
     else:
-        click.echo('No new width or height specified')
+        click.echo("No new width or height specified")

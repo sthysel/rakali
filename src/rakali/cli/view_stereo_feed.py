@@ -1,15 +1,13 @@
 """ View a stereo camera feed """
 
 import logging
-import numpy as np
 
 import click
-
-from rakali.video import go
-from rakali.stereo.reader import StereoCamera
-
+import numpy as np
 from rakali import VideoPlayer
 from rakali.annotate import add_frame_labels, colors
+from rakali.stereo.reader import StereoCamera
+from rakali.video import go
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,11 +18,11 @@ def decorate_frame(frame, side, count, source):
     img = add_frame_labels(
         frame=frame,
         labels=[
-            f'{side}',
-            f'{source}',
-            f'frame # {count}',
+            f"{side}",
+            f"{source}",
+            f"frame # {count}",
         ],
-        color=colors.get('BHP'),
+        color=colors.get("BHP"),
     )
     return img
 
@@ -32,16 +30,16 @@ def decorate_frame(frame, side, count, source):
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.option(
-    '-l',
-    '--left-eye',
-    help='Left eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
+    "-l",
+    "--left-eye",
+    help="Left eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file",
     default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1",
     show_default=True,
 )
 @click.option(
-    '-r',
-    '--right-eye',
-    help='Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
+    "-r",
+    "--right-eye",
+    help="Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file",
     default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=2",
     show_default=True,
 )
@@ -59,12 +57,16 @@ def cli(left_eye, right_eye):
             if ok:
                 count += 1
                 annotated = []
-                for side, source, frame in zip(('left', 'right'), (left_eye, right_eye), frames.frames()):
-                    annotated.append(decorate_frame(
-                        frame=frame,
-                        side=side,
-                        count=count,
-                        source=source,
-                    ))
+                for side, source, frame in zip(
+                    ("left", "right"), (left_eye, right_eye), frames.frames()
+                ):
+                    annotated.append(
+                        decorate_frame(
+                            frame=frame,
+                            side=side,
+                            count=count,
+                            source=source,
+                        )
+                    )
                 stack = np.hstack(annotated)
                 player.show(stack)

@@ -1,10 +1,9 @@
-import cv2 as cv
-import numpy as np
 from pathlib import Path
-
 from typing import Tuple
 
+import cv2 as cv
 import imutils
+import numpy as np
 
 from .annotate import add_frame_labels
 
@@ -27,10 +26,10 @@ class ImageSize:
         return cls(height, width)
 
     def __str__(self):
-        return f'height: {self.height}, width: {self.width}'
+        return f"height: {self.height}, width: {self.width}"
 
     def __repr__(self):
-        return f'ImageSize(height={self.height}, width={self.width})'
+        return f"ImageSize(height={self.height}, width={self.width})"
 
 
 class Image:
@@ -58,9 +57,9 @@ class Image:
     def info(self):
         """print some information about the loaded image"""
         height, width, channels = self.mat.shape
-        print(f'-- {width} px')
-        print(f'|  {height} px')
-        print(f'channels {channels}')
+        print(f"-- {width} px")
+        print(f"|  {height} px")
+        print(f"channels {channels}")
 
     def add_text(
         self,
@@ -176,7 +175,9 @@ class Image:
         )
         return self
 
-    def adjust_brightness_contrast(self, brightness: float = 0.0, contrast: float = 0.0, beta=0):
+    def adjust_brightness_contrast(
+        self, brightness: float = 0.0, contrast: float = 0.0, beta=0
+    ):
         """
         Adjust the brightness and/or contrast of an image
         :param contrast: Float, contrast adjustment with 0 meaning no change
@@ -192,10 +193,10 @@ class Image:
         )
         return self
 
-    def show(self, wait=0, key='q', name='Image'):
+    def show(self, wait=0, key="q", name="Image"):
         """display image"""
 
-        cv.imshow('Image', self.mat)
+        cv.imshow("Image", self.mat)
         while True:
             if cv.waitKey(wait) & 0xFF == ord(key):
                 break

@@ -2,15 +2,15 @@
 Calibrate fisheye camera given set of chessboard images
 """
 
-import click
-import sys
-import random
-from pathlib import Path
 import logging
+import random
+import sys
+from pathlib import Path
+
+import click
 
 # from rakali.camera.fisheye import save_calibration
-from rakali.camera import fisheye
-from rakali.camera import chessboard
+from rakali.camera import chessboard, fisheye
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -19,58 +19,58 @@ logger = logging.getLogger(__name__)
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.option(
-    '-i',
-    '--input-folder',
-    help='Folder where chessboard images are stored',
-    default='~/rakali/chessboards/',
+    "-i",
+    "--input-folder",
+    help="Folder where chessboard images are stored",
+    default="~/rakali/chessboards/",
     show_default=True,
 )
 @click.option(
-    '--image-points-file',
-    help='Corner points data',
-    default='image_points.json',
+    "--image-points-file",
+    help="Corner points data",
+    default="image_points.json",
     show_default=True,
 )
 @click.option(
-    '--calibration-file',
-    help='Camera calibration data',
-    default='fisheye_calibration.json',
+    "--calibration-file",
+    help="Camera calibration data",
+    default="fisheye_calibration.json",
     show_default=True,
 )
 @click.option(
-    '--chessboard-rows',
-    help='Chessboard rows',
+    "--chessboard-rows",
+    help="Chessboard rows",
     default=9,
     show_default=True,
 )
 @click.option(
-    '--chessboard-columns',
-    help='Chessboard columns',
+    "--chessboard-columns",
+    help="Chessboard columns",
     default=6,
     show_default=True,
 )
 @click.option(
-    '--square-size',
-    help='Chessboard square size in m',
+    "--square-size",
+    help="Chessboard square size in m",
     default=0.023,
     show_default=True,
 )
 @click.option(
-    '--salt',
-    help='Seed value for random picking of calibration images from a large set',
+    "--salt",
+    help="Seed value for random picking of calibration images from a large set",
     default=888,
     show_default=True,
 )
 @click.option(
-    '--pick-size',
-    help='Size of image set to use for calibration, picked from available set',
+    "--pick-size",
+    help="Size of image set to use for calibration, picked from available set",
     default=50,
     show_default=True,
 )
 @click.option(
-    '--cid',
-    help='Calibration ID to associate a calibration file with a device',
-    default='fisheye',
+    "--cid",
+    help="Calibration ID to associate a calibration file with a device",
+    default="fisheye",
     show_default=True,
 )
 def cli(
@@ -89,12 +89,12 @@ def cli(
     """
 
     if pick_size < 5:
-        print(f'A set of {pick_size} is to small')
+        print(f"A set of {pick_size} is to small")
         sys.exit()
 
     input_folder = Path(input_folder).expanduser()
     if not input_folder.exists():
-        click.secho(message=f'Folder {input_folder} does not exist', err=True)
+        click.secho(message=f"Folder {input_folder} does not exist", err=True)
         sys.exit()
 
     chessboard_size = (chessboard_columns, chessboard_rows)
@@ -104,7 +104,11 @@ def cli(
     if exiting_points:
         object_points, image_points, image_size = exiting_points
     else:
-        object_points, image_points, image_size = chessboard.get_points_from_chessboard_images(
+        (
+            object_points,
+            image_points,
+            image_size,
+        ) = chessboard.get_points_from_chessboard_images(
             boards_path=input_folder,
             chessboard_size=chessboard_size,
             square_size=square_size,
@@ -139,7 +143,7 @@ def cli(
         cid=cid,
     )
 
-    print(f'DIM={image_size}')
-    print(f'K=np.array({str(K.tolist())})')
-    print(f'D=np.array({str(D.tolist())})')
-    click.secho(message=f'Calibration error: {rms}')
+    print(f"DIM={image_size}")
+    print(f"K=np.array({str(K.tolist())})")
+    print(f"D=np.array({str(D.tolist())})")
+    click.secho(message=f"Calibration error: {rms}")

@@ -40,4 +40,3 @@ Clone or download this repo and in your virtualenv do:
    $ pip install .
 
 .. |Rakali by Ravenari| image:: docs/pics/rakali.jpg
-

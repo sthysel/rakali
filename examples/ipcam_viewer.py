@@ -8,7 +8,7 @@ WATER_HEATER = 2
 PARK = 3
 BACK_LAWN = 4
 
-SOURCE = f'rtsp://10.0.0.247:554/ch0{WATER_HEATER}/01'
+SOURCE = f"rtsp://10.0.0.247:554/ch0{WATER_HEATER}/01"
 
 
 def size(img):
@@ -16,11 +16,11 @@ def size(img):
     img = add_frame_labels(
         frame=img,
         labels=[
-            f'size: {w}x{h}',
-            'Geyser watch',
-            'q to quit',
+            f"size: {w}x{h}",
+            "Geyser watch",
+            "q to quit",
         ],
-        color=colors.get('GREEN'),
+        color=colors.get("GREEN"),
     )
     return img
 

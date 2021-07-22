@@ -15,8 +15,8 @@ class StereoFrame:
         self,
         left,
         right,
-        left_name='left',
-        right_name='right',
+        left_name="left",
+        right_name="right",
         timestamp=None,
     ):
 
@@ -42,7 +42,7 @@ class StereoFrame:
         break the calibration pipeline
         """
 
-        return (('left', self.left), ('right', self.right))
+        return (("left", self.left), ("right", self.right))
 
     def is_good(self):
         return (self.left is not None) and (self.right is not None)
@@ -70,10 +70,10 @@ class StereoCamera:
         """
 
         if left_src.strip() != right_src.strip():
-            self.right_reader = VideoStream(name='Left', src=left_src)
-            self.left_reader = VideoStream(name='Right', src=right_src)
+            self.right_reader = VideoStream(name="Left", src=left_src)
+            self.left_reader = VideoStream(name="Right", src=right_src)
         else:
-            logger.error('Stream sources are identical')
+            logger.error("Stream sources are identical")
             sys.exit()
 
     def __enter__(self):

@@ -115,7 +115,7 @@ Options:
   --chessboard-rows INTEGER     Chessboard rows  [default: 9]
   --chessboard-columns INTEGER  Chessboard columns  [default: 6]
   --help                        Show this message and exit.
-  
+
 ```
 
 The process will drop calibration frames in the target folder like these:
@@ -155,7 +155,7 @@ Options:
   --chessboard-columns INTEGER  Chessboard columns  [default: 6]
   --help                        Show this message and exit.
 ```
-  
+
 ![View](docs/pics/stereo-chessboard.jpg)
 
 
@@ -171,7 +171,7 @@ $ tree ~/rakali/stereo/chessboards
 
 ```
 
-  
+
 ## rakali-calibrate-pinhole
 
 Calibrate a video camera with a pinhole lens
@@ -221,7 +221,7 @@ Options:
   --pick-size INTEGER           Size of image set to use for calibration, picked from available set  [default: 50]
   --cid TEXT                    Calibration ID to associate a calibration file with a device  [default: fisheye]
   --help                        Show this message and exit.
-  
+
 ```
 
 
@@ -340,7 +340,7 @@ Calibration error: 0.46991635076102695
 
 ## rakali-undistort-pinhole
 
-Correct video feed from calibrated standard pinhole camera 
+Correct video feed from calibrated standard pinhole camera
 
 `$ rakali-undistort-pinhole --help`
 
@@ -359,7 +359,7 @@ Options:
 
 ## rakali-undistort-fisheye
 
-Correct video feed from calibrated fisheye-lens camera 
+Correct video feed from calibrated fisheye-lens camera
 
 `$ rakali-undistort-fisheye --help`
 
@@ -375,7 +375,7 @@ Options:
   --calibration-file PATH  Camera calibration data  [default: fisheye_calibration.npz]
   -b, --balance FLOAT      Balance value 0.0 ~30% pixel loss, 1.0 no loss  [default: 1.0]
   --help                   Show this message and exit.
-  
+
 ```
 
 `$ rakali-undistort-fisheye`
@@ -392,7 +392,7 @@ Options:
 ![View](docs/pics/fisheye-undistort-balance0.0.jpg)
 
 
-## rakali-undistort-fisheye-image 
+## rakali-undistort-fisheye-image
 
 `$ rakali-undistort-fisheye-image --help`
 
@@ -430,7 +430,7 @@ Options:
   -r, --right-eye TEXT  Right eye, can be local USB cam (0|1|2..) or IP cam rtsp URL or file  [default: http://axis-
                         lab/axis-cgi/mjpg/video.cgi?&camera=2]
   --help                Show this message and exit.
-  
+
 ```
 
 ![Stereo View](docs/pics/stereo-view.jpg)
@@ -438,7 +438,7 @@ Options:
 ## rakali-split-stereo-feed
 
 Split source stereo recording into left and right camera views
-  
+
 `$ rakali-split-stereo-feed --help`
 
 ```
@@ -586,4 +586,3 @@ Clone or download this repo and in your virtualenv do:
 ```
 $ pip install .
 ```
-

@@ -1,6 +1,5 @@
-import time
-
 import functools
+import time
 
 
 def cost(func):

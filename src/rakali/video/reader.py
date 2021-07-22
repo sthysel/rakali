@@ -162,7 +162,7 @@ class VideoStream(Thread):
     def __init__(
         self,
         src=0,
-        name='video stream',
+        name="video stream",
         fps=0,
     ):
         super().__init__()

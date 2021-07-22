@@ -6,11 +6,10 @@ import logging
 from pathlib import Path
 
 import click
-
 from rakali import VideoPlayer
+from rakali.annotate import add_frame_labels, colors
 from rakali.camera.pinhole import CalibratedPinholeCamera
 from rakali.video import VideoFile, go
-from rakali.annotate import add_frame_labels, colors
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,16 +19,16 @@ logger = logging.getLogger(__name__)
 @click.command(context_settings=dict(max_content_width=120))
 @click.version_option()
 @click.option(
-    '-s',
-    '--source',
-    help='Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file',
+    "-s",
+    "--source",
+    help="Video source, can be local USB cam (0|1|2..) or IP cam rtsp URL or file",
     default="http://axis-lab/axis-cgi/mjpg/video.cgi?&camera=1",
     show_default=True,
 )
 @click.option(
-    '--calibration-file',
-    help='Camera calibration data',
-    default='pinhole_calibration.npz',
+    "--calibration-file",
+    help="Camera calibration data",
+    default="pinhole_calibration.npz",
     show_default=True,
 )
 def cli(source, calibration_file):
@@ -48,7 +47,7 @@ def cli(source, calibration_file):
                 frame = camera.correct(frame)
                 frame = add_frame_labels(
                     frame=frame,
-                    labels=[f'undistort cost: {camera.correct.cost:6.3f}s'],
-                    color=colors.get('BHP'),
+                    labels=[f"undistort cost: {camera.correct.cost:6.3f}s"],
+                    color=colors.get("BHP"),
                 )
                 player.show(frame)

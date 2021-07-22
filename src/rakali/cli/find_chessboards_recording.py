@@ -3,19 +3,18 @@
 Find chessboard pattern in video recording
 """
 
+import sys
+import time
+from multiprocessing import Process, Queue, cpu_count
 from pathlib import Path
 
 import cv2 as cv
-import time
-import sys
-from multiprocessing import Process, Queue, cpu_count
-
 from rakali.camera.chessboard import ChessboardFinder
-from rakali.video.reader import VideoFrameEnqueuer
 from rakali.video.fps import cost
+from rakali.video.reader import VideoFrameEnqueuer
 
-SOURCE = '~/calib/pinhole/l.mkv'
-OUT_FOLDER = '~/calib/chessboards/pinhole/left/'
+SOURCE = "~/calib/pinhole/l.mkv"
+OUT_FOLDER = "~/calib/chessboards/pinhole/left/"
 
 
 class FindWorker(Process):
@@ -27,18 +26,18 @@ class FindWorker(Process):
         self.finder = ChessboardFinder()
 
     def run(self):
-        print(f'Process {self.name} running')
+        print(f"Process {self.name} running")
         q = self.q
         finder = self.finder
         while True:
             ok, frame, frame_number = q.get()
             if ok:
-                print(f'{self.name} processing frame {frame_number}')
+                print(f"{self.name} processing frame {frame_number}")
                 if finder.has_chessboard(frame):
-                    print(f'{self.name} found chessboard')
-                    cv.imwrite(f'{self.out}/{frame_number:05}.jpg', frame)
+                    print(f"{self.name} found chessboard")
+                    cv.imwrite(f"{self.out}/{frame_number:05}.jpg", frame)
             else:
-                print(f'{self.name} queue empty, done.')
+                print(f"{self.name} queue empty, done.")
                 break
 
 
@@ -58,7 +57,7 @@ def find_chessboards_in_file(source, out_folder):
             worker = FindWorker(
                 q=enqueuer.q,
                 out_path=out_path,
-                name=f'FindWorker #{i}',
+                name=f"FindWorker #{i}",
             )
             workers.append(worker)
 
@@ -70,11 +69,11 @@ def find_chessboards_in_file(source, out_folder):
             if any(proces.is_alive() for proces in workers):
                 time.sleep(1)
             else:
-                print('All workers done')
+                print("All workers done")
                 return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     find_chessboards_in_file(source=SOURCE, out_folder=OUT_FOLDER)
-    print(f'Processed {SOURCE} in {find_chessboards_in_file.cost}s')
+    print(f"Processed {SOURCE} in {find_chessboards_in_file.cost}s")
     sys.exit()

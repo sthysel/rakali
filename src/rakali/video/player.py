@@ -18,7 +18,7 @@ class VideoPlayer:
         self,
         stream: VideoStream = None,
         scale=1,
-        window_name='Rakali Video',
+        window_name="Rakali Video",
         frame_callback=None,
     ):
         """Video player"""
@@ -48,7 +48,7 @@ class VideoPlayer:
         frame
         """
         with self.stream as st:
-            while cv.waitKey(1) & 0xFF != ord('q'):
+            while cv.waitKey(1) & 0xFF != ord("q"):
                 ok, frame = st.read()
                 if ok:
                     img = self.rescale(frame)
@@ -56,7 +56,7 @@ class VideoPlayer:
                         img = self.callback(img)
                     cv.imshow(self.window_name, img)
                 else:
-                    print('No more frames')
+                    print("No more frames")
                     sys.exit()
 
         cv.destroyAllWindows()

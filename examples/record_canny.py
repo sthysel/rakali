@@ -3,12 +3,13 @@
 Cannyfy Live USB video stream
 """
 
-from rakali import VideoPlayer, VideoStream, VideoWriter
-from rakali.video.fps import cost
-from rakali.video import go
-from rakali.annotate import add_frame_labels, colors
-import imutils
 import logging
+
+import imutils
+from rakali import VideoPlayer, VideoStream, VideoWriter
+from rakali.annotate import add_frame_labels, colors
+from rakali.video import go
+from rakali.video.fps import cost
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -19,10 +20,10 @@ def canny(img):
     img = add_frame_labels(
         frame=img,
         labels=[
-            f'canny cost: {canny.cost:6.3f}s',
-            'q to quit',
+            f"canny cost: {canny.cost:6.3f}s",
+            "q to quit",
         ],
-        color=colors.get('WHITE'),
+        color=colors.get("WHITE"),
     )
     return img
 
@@ -30,7 +31,7 @@ def canny(img):
 stream = VideoStream(src=0)
 writer = VideoWriter(
     size=stream.get_wh_size(),
-    file_name='canny.avi',
+    file_name="canny.avi",
     color=False,
     fps=60,
 )

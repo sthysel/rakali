@@ -7,9 +7,8 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-
 import cv2 as cv
+import numpy as np
 from rakali.video.fps import cost
 
 from .fisheye import STOP_CRITERIA, get_maps, undistort
@@ -17,23 +16,27 @@ from .save import NumpyEncoder
 
 logger = logging.getLogger(__name__)
 
-CALIBRATE_FLAGS = cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv.fisheye.CALIB_CHECK_COND + cv.fisheye.CALIB_FIX_SKEW
+CALIBRATE_FLAGS = (
+    cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC
+    + cv.fisheye.CALIB_CHECK_COND
+    + cv.fisheye.CALIB_FIX_SKEW
+)
 
 
 def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     """ do stereo calibration using pre-calibration values from left and right eyes """
 
-    print('Calibrate Fisheye Stereo camera using pre-calibrated values')
+    print("Calibrate Fisheye Stereo camera using pre-calibrated values")
 
-    chessboard_size = calibration_data['chessboard_size']
+    chessboard_size = calibration_data["chessboard_size"]
     board_area = chessboard_size[0] * chessboard_size[1]
-    img_size = calibration_data['left']['image_size']
+    img_size = calibration_data["left"]["image_size"]
 
     if use_pre_calibrated:
-        K_left = calibration_data['left']['K']
-        D_left = calibration_data['left']['D']
-        K_right = calibration_data['right']['K']
-        D_right = calibration_data['right']['D']
+        K_left = calibration_data["left"]["K"]
+        D_left = calibration_data["left"]["D"]
+        K_right = calibration_data["right"]["K"]
+        D_right = calibration_data["right"]["D"]
     else:
         K_left = np.zeros((3, 3))
         D_left = np.zeros((4, 1))
@@ -43,8 +46,8 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     R = np.zeros((1, 1, 3), dtype=np.float64)
     T = np.zeros((1, 1, 3), dtype=np.float64)
 
-    imgpoints_left = calibration_data['left']['image_points']
-    imgpoints_right = calibration_data['right']['image_points']
+    imgpoints_left = calibration_data["left"]["image_points"]
+    imgpoints_right = calibration_data["right"]["image_points"]
 
     # print(len(imgpoints_left), len(imgpoints_right))
     # with np.printoptions(precision=3, suppress=True):
@@ -54,7 +57,9 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     N_OK = len(imgpoints_left)
 
     objp = np.zeros((board_area, 1, 3), np.float64)
-    objp[:, 0, :2] = np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]].T.reshape(-1, 2)
+    objp[:, 0, :2] = np.mgrid[0 : chessboard_size[0], 0 : chessboard_size[1]].T.reshape(
+        -1, 2
+    )
 
     objpoints = np.array([objp] * len(imgpoints_left), dtype=np.float64)
     imgpoints_left = np.asarray(imgpoints_left, dtype=np.float64)
@@ -71,7 +76,15 @@ def stereo_calibrate(calibration_data, use_pre_calibrated=True):
     # print(imgpoints_left.shape)
     # print(imgpoints_right.shape)
 
-    rms, new_K_left, new_D_left, new_K_right, new_D_right, new_R, new_T = cv.fisheye.stereoCalibrate(
+    (
+        rms,
+        new_K_left,
+        new_D_left,
+        new_K_right,
+        new_D_right,
+        new_R,
+        new_T,
+    ) = cv.fisheye.stereoCalibrate(
         objectPoints=objpoints,
         imagePoints1=imgpoints_left,
         imagePoints2=imgpoints_right,
@@ -112,35 +125,37 @@ def save_stereo_calibration(
 ):
     """" Save calibration data """
 
-    calibration_parameters['image_size'] = image_size
-    calibration_parameters['salt'] = salt
-    calibration_parameters['pick_size'] = pick_size
-    calibration_parameters['cid'] = cid
+    calibration_parameters["image_size"] = image_size
+    calibration_parameters["salt"] = salt
+    calibration_parameters["pick_size"] = pick_size
+    calibration_parameters["cid"] = cid
 
-    dumped = json.dumps(calibration_parameters, cls=NumpyEncoder, indent=4, sort_keys=True)
-    with open(calibration_file, 'w') as f:
+    dumped = json.dumps(
+        calibration_parameters, cls=NumpyEncoder, indent=4, sort_keys=True
+    )
+    with open(calibration_file, "w") as f:
         f.write(dumped)
 
 
 def load_stereo_calibration(calibration_file) -> dict:
     """load from previously computed file """
 
-    print(f'Loading previously computed stereo calibration from {calibration_file}')
+    print(f"Loading previously computed stereo calibration from {calibration_file}")
     try:
-        with open(calibration_file, 'r') as f:
+        with open(calibration_file) as f:
             data = json.load(f)
             # TODO ignore individual calibrations for now
             return dict(
-                K_left=np.asarray(data['K_left']),
-                K_right=np.asarray(data['K_right']),
-                D_left=np.asarray(data['D_left']),
-                D_right=np.asarray(data['D_right']),
-                R=np.asarray(data['R']),
-                T=np.asarray(data['T']),
-                image_size=tuple(data['image_size']),
+                K_left=np.asarray(data["K_left"]),
+                K_right=np.asarray(data["K_right"]),
+                D_left=np.asarray(data["D_left"]),
+                D_right=np.asarray(data["D_right"]),
+                R=np.asarray(data["R"]),
+                T=np.asarray(data["T"]),
+                image_size=tuple(data["image_size"]),
             )
-    except IOError:
-        print(f'{calibration_file} not found')
+    except OSError:
+        print(f"{calibration_file} not found")
         return None
 
 
@@ -148,37 +163,37 @@ def print_calibration(calibration):
     """ Pretty print stereo fisheye calibration parameters """
 
     with np.printoptions(precision=3, suppress=True):
-        print('K Left')
-        print(calibration['K_left'])
-        print('K Right')
-        print(calibration['K_right'])
-        print('D Left')
-        print(calibration['D_left'])
-        print('D Right')
-        print(calibration['D_right'])
+        print("K Left")
+        print(calibration["K_left"])
+        print("K Right")
+        print(calibration["K_right"])
+        print("D Left")
+        print(calibration["D_left"])
+        print("D Right")
+        print(calibration["D_right"])
 
-        print('R')
-        print(calibration['R'])
-        print('T')
-        print(calibration['T'])
+        print("R")
+        print(calibration["R"])
+        print("T")
+        print(calibration["T"])
 
 
 def calibration_labels(calibration, side):
     """calibration labels for annotating frames"""
     labels = []
-    if side == 'left':
+    if side == "left":
         with np.printoptions(precision=3, suppress=True):
-            labels.extend('K\n{K_left}'.format(**calibration).split('\n'))
-            labels.extend('D\n{D_left}'.format(**calibration).split('\n'))
-            labels.extend('R\n{R}'.format(**calibration).split('\n'))
-            labels.extend('T\n{T}'.format(**calibration).split('\n'))
+            labels.extend("K\n{K_left}".format(**calibration).split("\n"))
+            labels.extend("D\n{D_left}".format(**calibration).split("\n"))
+            labels.extend("R\n{R}".format(**calibration).split("\n"))
+            labels.extend("T\n{T}".format(**calibration).split("\n"))
 
-    if side == 'right':
+    if side == "right":
         with np.printoptions(precision=3, suppress=True):
-            labels.extend('K\n{K_right}'.format(**calibration).split('\n'))
-            labels.extend('D\n{D_right}'.format(**calibration).split('\n'))
-            labels.extend('R\n{R}'.format(**calibration).split('\n'))
-            labels.extend('T\n{T}'.format(**calibration).split('\n'))
+            labels.extend("K\n{K_right}".format(**calibration).split("\n"))
+            labels.extend("D\n{D_right}".format(**calibration).split("\n"))
+            labels.extend("R\n{R}".format(**calibration).split("\n"))
+            labels.extend("T\n{T}".format(**calibration).split("\n"))
     return labels
 
 
@@ -191,16 +206,18 @@ class CalibratedStereoFisheyeCamera:
         balance,
         dim2=None,
         dim3=None,
-        name='stereo fisheye',
+        name="stereo fisheye",
     ):
         self.balance = balance
         self.name = name
         self.dim2 = dim2
         self.dim3 = dim3
         if Path(calibration_file).exists():
-            self.calibration = load_stereo_calibration(calibration_file=calibration_file)
+            self.calibration = load_stereo_calibration(
+                calibration_file=calibration_file
+            )
         else:
-            logger.error(f'Calibration file {calibration_file} does not exist')
+            logger.error(f"Calibration file {calibration_file} does not exist")
             self.calibration = None
 
         print_calibration(self.calibration)
@@ -214,15 +231,15 @@ class CalibratedStereoFisheyeCamera:
     def cid(self):
         """calibration id"""
         if self.calibration:
-            return self.calibration.get('cid', 'UNSET')
+            return self.calibration.get("cid", "UNSET")
         else:
-            return 'UNSET'
+            return "UNSET"
 
     @property
     def calibration_time(self):
         """calibration time"""
         if self.calibration:
-            return self.calibration.get('time', -1)
+            return self.calibration.get("time", -1)
         else:
             return -1
 
@@ -235,13 +252,13 @@ class CalibratedStereoFisheyeCamera:
         """ set rotation matrices """
 
         self.R_left, self.R_right, self.P1, self.P2, self.Q = cv.fisheye.stereoRectify(
-            K1=self.calibration['K_left'],
-            D1=self.calibration['D_left'],
-            K2=self.calibration['K_right'],
-            D2=self.calibration['D_right'],
-            imageSize=self.calibration['image_size'],
-            R=self.calibration['R'],
-            tvec=self.calibration['T'],
+            K1=self.calibration["K_left"],
+            D1=self.calibration["D_left"],
+            K2=self.calibration["K_right"],
+            D2=self.calibration["D_right"],
+            imageSize=self.calibration["image_size"],
+            R=self.calibration["R"],
+            tvec=self.calibration["T"],
             flags=cv.CALIB_ZERO_DISPARITY,
             balance=self.balance,
             fov_scale=1,
@@ -253,9 +270,9 @@ class CalibratedStereoFisheyeCamera:
         if self.calibration:
             self.left_map1, self.left_map2 = get_maps(
                 img=first_frame,
-                image_size=self.calibration['image_size'],
-                K=self.calibration['K_left'],
-                D=self.calibration['D_left'],
+                image_size=self.calibration["image_size"],
+                K=self.calibration["K_left"],
+                D=self.calibration["D_left"],
                 R=self.R_left,
                 balance=self.balance,
                 # dim2=self.dim2,
@@ -263,16 +280,16 @@ class CalibratedStereoFisheyeCamera:
             )
             self.right_map1, self.right_map2 = get_maps(
                 img=first_frame,
-                image_size=self.calibration['image_size'],
-                K=self.calibration['K_right'],
-                D=self.calibration['D_right'],
+                image_size=self.calibration["image_size"],
+                K=self.calibration["K_right"],
+                D=self.calibration["D_right"],
                 R=self.R_right,
                 balance=self.balance,
                 # dim2=self.dim2,
                 # dim3=self.dim3,
             )
         else:
-            logger.error('Load calibration before setting the maps')
+            logger.error("Load calibration before setting the maps")
 
     @cost
     def correct(self, left, right):
