@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "rakali"
+version = "0.1.0"
+description = "Rakali is a image processing library"
+authors = ["sthysel <sthysel@gmail>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/sthysel/rakali"
+repository = "https://github.com/sthysel/rakali"
+
+classifiers=[
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities"
+]
+
+[tool.poetry.scripts]
+rakali = "rakali.cli.show:cli"
+rakali-calibrate-fisheye = "rakali.cli.calibrate_fisheye:cli"
+rakali-calibrate-fisheye-stereo = "rakali.cli.calibrate_fisheye_stereo:cli"
+rakali-calibrate-pinhole = "rakali.cli.calibrate_pinhole:cli"
+rakali-disparity-fisheye-pair = "rakali.cli.disparity_fisheye:cli"
+rakali-find-chessboards = "rakali.cli.find_chessboards_live:cli"
+rakali-find-chessboards-stereo = "rakali.cli.find_chessboards_stereo_live:cli"
+rakali-find-ipcameras = "rakali.cli.find_ip_cameras:cli"
+rakali-split-stereo-feed = "rakali.cli.split_feed:cli"
+rakali-undistort-fisheye = "rakali.cli.undistort_fisheye:cli"
+rakali-undistort-fisheye-image = "rakali.cli.undistort_fisheye_image:cli"
+rakali-undistort-fisheye-stereo = "rakali.cli.view_stereo_feed_corrected:cli"
+rakali-undistort-pinhole = "rakali.cli.undistort_pinhole:cli"
+rakali-view = "rakali.cli.view_feed:cli"
+rakali-view-stereo = "rakali.cli.view_stereo_feed:cli"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+click = "^8.0.1"
+tabulate = "^0.8.9"
+numpy = "^1.21.1"
+scipy = "^1.7.0"
+opencv-python = "^4.5.3"
+imutils = "^0.5.4"
+matplotlib = "^3.4.2"
+GPUtil = "^1.4.0"
+py-cpuinfo = "^8.0.0"
+python-nmap = "^0.6.4"
+
+[tool.poetry.dev-dependencies]
+tox = "^3.24.0"
+pytest = "^6.2.4"
+bumpversion = "^0.6.0"
+flake8 = "^3.9.2"
+autoflake = "^1.4"
+autopep8 = "^1.5.7"
+black = "^21.7b0"
+importmagic = "^0.1.7"
+epc = "^0.0.5"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
