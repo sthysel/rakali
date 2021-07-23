@@ -45,7 +45,10 @@ class Image:
     @classmethod
     def from_file(cls, path: Path):
         """load image from file"""
-        img = cv.imread(path)
+        if not path:
+            print('Path is not set')
+            exit()
+        img = cv.imread(str(path))
         return cls(img)
 
     @classmethod
