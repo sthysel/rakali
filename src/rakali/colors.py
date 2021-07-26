@@ -12,7 +12,7 @@ class NoSuchColorException(Exception):
 
 def _to_bgr(color):
     """convert RGB color to BGR color"""
-    r, g, b = [round(x * 255) for x in mcolors.to_rgb(color)]
+    r, g, b = (round(x * 255) for x in mcolors.to_rgb(color))
     return b, g, r
 
 

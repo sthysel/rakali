@@ -32,7 +32,7 @@ class FPS:
         return self
 
     def stop(self):
-        """stop the timer """
+        """stop the timer"""
         self._stop = time.perf_counter()
         self._frames += 1
 
@@ -49,5 +49,5 @@ class FPS:
         return self.cost() * 1000
 
     def fps(self):
-        """the (approximate) frames per second """
+        """the (approximate) frames per second"""
         return 1 / self.cost()

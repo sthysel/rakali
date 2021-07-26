@@ -54,7 +54,7 @@ def reprojection_error(
     camera_matrix,
     distortion,
 ):
-    """ Calculate reprojection error"""
+    """Calculate reprojection error"""
 
     total_error = 0
     length = len(object_points)
@@ -85,7 +85,7 @@ def save_calibration(
     error: float,
     cid: str,
 ):
-    """Save pinhole calibration to file """
+    """Save pinhole calibration to file"""
     np.savez_compressed(
         calibration_file,
         camera_matrix=camera_matrix,
@@ -134,7 +134,7 @@ def undistort(img, calibration):
 
 
 class CalibratedPinholeCamera:
-    """ A calibrated pinhole camera """
+    """A calibrated pinhole camera"""
 
     def __init__(
         self,

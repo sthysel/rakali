@@ -63,7 +63,7 @@ class VideoPlayer:
         sys.exit()
 
     def show(self, frame):
-        """ Show the frame """
+        """Show the frame"""
 
         img = self.rescale(frame)
         if self.callback:
