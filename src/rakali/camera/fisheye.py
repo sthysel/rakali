@@ -24,7 +24,7 @@ CALIBRATE_FLAGS = (
 
 
 def calibrate(object_points, image_points, image_size):
-    """ Calibrate the camera using image points """
+    """Calibrate the camera using image points"""
 
     obj_length = len(object_points)
     print(f"Calibrating on {obj_length} objects...")
@@ -172,7 +172,7 @@ def undistort(img, map1, map2):
 
 
 class CalibratedFisheyeCamera:
-    """ A Calibrated fish-eye camera """
+    """A Calibrated fish-eye camera"""
 
     def __init__(
         self,
@@ -215,7 +215,7 @@ class CalibratedFisheyeCamera:
 
     @property
     def calibration_time_formatted(self):
-        """ formated calibration time """
+        """formated calibration time"""
         return datetime.fromtimestamp(self.calibration_time)
 
     def set_balance(self, balance, frame):

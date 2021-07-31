@@ -4,7 +4,7 @@ import numpy as np
 
 
 class NumpyEncoder(json.JSONEncoder):
-    """ json encoder for numpy types """
+    """json encoder for numpy types"""
 
     def default(self, obj):
         if isinstance(

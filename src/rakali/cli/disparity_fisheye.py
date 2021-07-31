@@ -207,7 +207,7 @@ def get_frames(chessboards_folder, image_number):
 
 
 def add_calib_info(camera, img, side):
-    """label the corrected frames to aid in diagnostics """
+    """label the corrected frames to aid in diagnostics"""
 
     return add_frame_labels(
         frame=img,
@@ -217,7 +217,7 @@ def add_calib_info(camera, img, side):
 
 
 def add_reticle(img):
-    """ adds markup to frame for warp debug"""
+    """adds markup to frame for warp debug"""
 
     olive = colors.get("OLIVE")
     h, w = img.shape[:2]

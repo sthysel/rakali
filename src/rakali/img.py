@@ -69,7 +69,7 @@ class Image:
         labels=[],
         **kwargs,
     ):
-        """ Add labels to image"""
+        """Add labels to image"""
         add_frame_labels(frame=self.mat, labels=labels, **kwargs)
 
     def translate(self, x: int, y: int):
@@ -123,12 +123,12 @@ class Image:
         return self
 
     def grey(self):
-        """Grey image """
+        """Grey image"""
         self.mat = cv.cvtColor(self.mat, cv.COLOR_BGR2GRAY)
         return self
 
     def gray(self):
-        """Gray image """
+        """Gray image"""
         # irritating yanks
         return self.grey()
 
@@ -137,7 +137,7 @@ class Image:
         kernel_size: Tuple = (3, 3),
         structuring: int = cv.MORPH_RECT,
     ):
-        """skeletonize image """
+        """skeletonize image"""
 
         grey = self.grey().mat
 
@@ -171,7 +171,7 @@ class Image:
         return self
 
     def auto_canny(self, sigma=0.33):
-        """compute the median of the single channel pixel intensities """
+        """compute the median of the single channel pixel intensities"""
         self.mat = imutils.auto_canny(
             image=self.mat,
             sigma=sigma,

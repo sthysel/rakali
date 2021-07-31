@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
     show_default=True,
 )
 def cli(source, calibration_file):
-    """ Undistort live feed from pinhole model type camera """
+    """Undistort live feed from pinhole model type camera"""
 
     calibration_path = Path(calibration_file).expanduser()
 

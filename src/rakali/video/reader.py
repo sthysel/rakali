@@ -32,7 +32,7 @@ class VideoFile:
 
     @cost
     def read(self):
-        """Return the latest frame """
+        """Return the latest frame"""
         return self.stream.read()
 
     def __enter__(self):
@@ -83,7 +83,7 @@ class VideoFrameEnqueuer(Thread):
 
     @cost
     def read(self):
-        """Return the latest frame """
+        """Return the latest frame"""
         return self.q.get(timeout=2)
 
     def __enter__(self):
@@ -235,7 +235,7 @@ class VideoStream(Thread):
         self.stream.release()
 
     def read(self):
-        """Return the latest frame """
+        """Return the latest frame"""
         self.read_count += 1
         return self.grabbed, self.frame
 

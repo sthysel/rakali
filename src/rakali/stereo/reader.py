@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class StereoFrame:
-    """ a set of time-synced frames """
+    """a set of time-synced frames"""
 
     def __init__(
         self,

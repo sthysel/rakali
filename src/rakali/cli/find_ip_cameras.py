@@ -40,7 +40,7 @@ def get_local_net():
 @click.version_option()
 @option_config
 def cli(config):
-    """ Discover IP cameras on local LAN """
+    """Discover IP cameras on local LAN"""
 
 
 @cli.command("service")
